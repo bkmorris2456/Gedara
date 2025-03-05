@@ -6,10 +6,16 @@ import Card from '../components/card';
 export default function Home({ navigation }) {
   return (
     <Template navigation={navigation}>
-      <Text>Home Screen</Text>
 
       <Card width="100%" height={200}>
-        <Text>Card Component</Text>
+        <View width="100%" style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <Card width="47%" height={100} variant="light">
+            <Text>Child Card Component</Text>
+          </Card>
+          <Card width="47%" height={100} variant="light">
+            <Text>Child Card Component</Text>
+          </Card>
+        </View>
       </Card>
     </Template>
   );
