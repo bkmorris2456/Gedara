@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, useColorScheme } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
 // Placeholder logo
 const logo = require('../../assets/favicon.png');
@@ -16,8 +17,8 @@ const Template = ({ children, navigation }) => {
       <View style={[styles.header, { backgroundColor: isDarkMode ? '#1e1e1e' : '#eee' }]}>
         <Image source={logo} style={styles.logo} />
         <Text style={[styles.title, { color: isDarkMode ? '#fff' : '#000' }]}>Gedara</Text>
-        <TouchableOpacity onPress={() => alert('Search clicked')}>
-          <Ionicons name="search" size={24} color={isDarkMode ? '#fff' : '#000'} style={styles.icon} />
+        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+          <Ionicons name="person-circle-outline" size={24} color={isDarkMode ? '#fff' : '#000'} style={styles.icon} />
         </TouchableOpacity>
       </View>
 
