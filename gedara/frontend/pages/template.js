@@ -18,7 +18,7 @@ const Template = ({ children, navigation }) => {
         <Image source={logo} style={styles.logo} />
         <Text style={[styles.title, { color: isDarkMode ? '#fff' : '#000' }]}>Gedara</Text>
         <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-          <Ionicons name="person-circle-outline" size={24} color={isDarkMode ? '#fff' : '#000'} style={styles.icon} />
+          <Ionicons name="person-circle-outline" size={30} color={isDarkMode ? '#fff' : '#000'} style={styles.icon} />
         </TouchableOpacity>
       </View>
 
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
   logo: { width: 40, height: 40, resizeMode: 'contain' },
   title: { fontSize: 20, fontWeight: 'bold', flex: 1, textAlign: 'center' },
   icon: { marginRight: 10 },
-  content: { flex: 1, padding: 20 },
+  content: { flex: 1, padding: 20, marginTop: 10 },
 });
 
 export default Template;
