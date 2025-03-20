@@ -51,14 +51,14 @@ export default function Home({ navigation }) {
         <Text style={[styles.headers]}>Inventory Value</Text>
 
         <View style={styles.summaries}>
-          <Card width={100} height={100} style={{ marginRight: 10 }}>
-
+          <Card width={110} height={100} style={{ marginRight: 10 }}>
+            Total Items
           </Card>
-          <Card width={100} height={100} style={{ marginRight: 10 }}>
-
+          <Card width={110} height={100} style={{ marginRight: 10 }}>
+            Categories
           </Card>
-          <Card width={100} height={100} style={{ marginRight: 10 }}>
-
+          <Card width={110} height={100} style={{ marginRight: 10 }}>
+            Total Value
           </Card>
         </View>
 

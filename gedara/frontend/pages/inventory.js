@@ -16,21 +16,21 @@ export default function Inventory({ navigation }) {
 
           <Text style={[styles.headers]}>Main Home</Text>
 
-          <Card width={325} height={100}>
-
+          <Card width={300} height={100} style={{ marginBottom: 10 }}>
+            Main Property
           </Card> 
 
           <Text style={[styles.headers]}>Homes</Text>
 
           <ScrollView style={[styles.properties]}>
-            <Card width={325} height={100} style={{ marginRight: 10 }}>
+            <Card width={300} height={100} style={{ marginVertical: 10 }}>
               Property 1
             </Card>
-            <Card width={325} height={100} style={{ marginRight: 10 }}>
-              Property 1
+            <Card width={300} height={100} style={{ marginVertical: 10 }}>
+              Property 2
             </Card>
-            <Card width={325} height={100} style={{ marginRight: 10 }}>
-              Property 1
+            <Card width={300} height={100} style={{ marginVertical: 10 }}>
+              Property 3
             </Card>
           </ScrollView>
 
@@ -44,16 +44,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    maxHeight: "auto",
   },
   headers: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginVertical: 5,
     color: "#fff",
   },
   properties: {
     flexGrow: 1,
-    maxHeight: 200,
+    maxHeight: 350,
     marginVertical: 10,
     flexDirection: 'column',
     width: '100%',
