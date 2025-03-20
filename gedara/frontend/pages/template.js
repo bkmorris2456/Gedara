@@ -1,30 +1,38 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, useColorScheme } from 'react-native';
+import { View, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { Provider as PaperProvider, Text, Surface } from 'react-native-paper';
+import { theme } from '../theme';
 
 // Placeholder logo
 const logo = require('../../assets/favicon.png');
 
 const Template = ({ children, navigation }) => {
-  const colorScheme = useColorScheme(); // Detect theme mode
-  const isDarkMode = colorScheme === 'dark';
+  const { colors } = theme;
 
   return (
-    <SafeAreaView style={[styles.safeContainer, { backgroundColor: isDarkMode ? '#121212' : '#fff' }]}>
-      {/* Header Bar */}
-      <View style={[styles.header, { backgroundColor: isDarkMode ? '#1e1e1e' : '#eee' }]}>
-        <Image source={logo} style={styles.logo} />
-        <Text style={[styles.title, { color: isDarkMode ? '#fff' : '#000' }]}>Gedara</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-          <Ionicons name="person-circle-outline" size={30} color={isDarkMode ? '#fff' : '#000'} style={styles.icon} />
-        </TouchableOpacity>
-      </View>
+    <PaperProvider theme={theme}>
+      <SafeAreaView style={[styles.safeContainer, { backgroundColor: colors.primary }]}>
+        
+        {/* Header Bar */}
+        <Surface style={[styles.header, { backgroundColor: colors.primary }]} elevation={4}>
+          <Image source={logo} style={styles.logo} />
+          <Text variant="titleLarge" style={[styles.title, { color: colors.text }]}>
+            Gedara
+          </Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+            <Ionicons name="person-circle-outline" size={30} color={colors.text} style={styles.icon} />
+          </TouchableOpacity>
+        </Surface>
 
-      {/* Main Content */}
-      <View style={[styles.content, { backgroundColor: isDarkMode ? '#121212' : '#fff' }]}>{children}</View>
-    </SafeAreaView>
+        {/* Main Content */}
+        <View style={[styles.content, { backgroundColor: colors.primary }]}>
+          {children}
+        </View>
+
+      </SafeAreaView>
+    </PaperProvider>
   );
 };
 
@@ -37,7 +45,7 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   logo: { width: 40, height: 40, resizeMode: 'contain' },
-  title: { fontSize: 20, fontWeight: 'bold', flex: 1, textAlign: 'center' },
+  title: { flex: 1, textAlign: 'center' },
   icon: { marginRight: 10 },
   content: { flex: 1, padding: 20, marginTop: 10 },
 });

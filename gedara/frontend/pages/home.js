@@ -1,24 +1,29 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import Template from '../pages/template';
 import Card from '../components/card';
+import { Provider as PaperProvider, Text, Surface } from 'react-native-paper';
+import { theme } from '../theme';
 
 export default function Home({ navigation }) {
+
+  const { colors } = theme;
+
   return (
     <Template navigation={navigation}>
 
-      <View style={styles.container}>
+      <View style={[styles.container, { backgroundColor: colors.primary }]}>
 
         <Text style={[styles.headers]}>My Properties</Text>
 
         <ScrollView style={[styles.properties]} horizontal={true} showsHorizontalScrollIndicator={false}>
-          <Card width={200} height={150} style={{ marginRight: 10 }}>
+          <Card width={200} height={125} style={{ marginRight: 10 }}>
             Property 1
           </Card>
-          <Card width={200} height={150} style={{ marginRight: 10 }}>
+          <Card width={200} height={125} style={{ marginRight: 10 }}>
             Property 2
           </Card>
-          <Card width={200} height={150} style={{ marginRight: 10 }}>
+          <Card width={200} height={125} style={{ marginRight: 10 }}>
             Property 3
           </Card>
         </ScrollView>
@@ -76,20 +81,19 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
    }, // Default text color
   properties: {
-    marginVertical: 10,
+    marginVertical: 15,
     flexGrow: 1,
-    maxHeight: 175, // Limit height for the properties section
+    maxHeight: 200, // Limit height for the properties section
   },
   recent: {
-    marginVertical: 10,
+    marginVertical: 15,
     flexGrow: 1,
     maxHeight: 215, // Limit height for the recent properties section
     overflow: 'hidden', // Hide overflow to prevent scrollbars
   },
   summaries: {
-    flex: 1,
     flexDirection: 'row',
-    margin: 6,
+    marginVertical: 15,
     alignItems: 'center',
     justifyContent: 'center',
   }
