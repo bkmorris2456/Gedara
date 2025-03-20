@@ -17,7 +17,7 @@ export default function Settings({ navigation }) {
 
         <View style={[styles.pic, { width: 100, height: 100, borderRadius: 100 / 2 }]}>
           {/* <Image source={source} style={[styles.image, { width: , height: size, borderRadius: size / 2 }]} /> */}
-          <Text>Profile Pic</Text>
+          <Text style={{justifyContent: "center", alignItems: "center", display: "flex"}}>Profile Pic</Text>
         </View>
 
         <View style={[styles.settings_form, { backgroundColor: colors.primary }]}>
@@ -48,6 +48,8 @@ const styles = StyleSheet.create({
     height: "auto",
     flex: 1,
     padding: 10,
+    display: "flex",
+    alignItems: "center",
 
   },
   headers: {
@@ -57,7 +59,8 @@ const styles = StyleSheet.create({
   },
   pic: {
     overflow: 'hidden',
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
+    marginVertical: 20,
   },
   settings_form: {
     width: '350',

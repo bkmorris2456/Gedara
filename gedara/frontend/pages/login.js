@@ -36,6 +36,7 @@ const styles = StyleSheet.create({
     intro_text: {
         padding: 20,
         marginBottom: 10,
+        color: "#fff"
     },
     login_container: {
         flexDirection: 'column',

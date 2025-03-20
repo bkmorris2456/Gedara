@@ -3,10 +3,17 @@ import { View, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Provider as PaperProvider, Text, Surface } from 'react-native-paper';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { theme } from '../theme';
+
+// Import screens
+import Home from '../pages/home';
+import Inventory from '../pages/inventory';
+import Profile from '../pages/settings';
 
 // Placeholder logo
 const logo = require('../../assets/favicon.png');
+const Tab = createBottomTabNavigator();
 
 const Template = ({ children, navigation }) => {
   const { colors } = theme;
@@ -18,9 +25,19 @@ const Template = ({ children, navigation }) => {
         {/* Header Bar */}
         <Surface style={[styles.header, { backgroundColor: colors.primary }]} elevation={4}>
           <Image source={logo} style={styles.logo} />
-          <Text variant="titleLarge" style={[styles.title, { color: colors.text }]}>
-            Gedara
-          </Text>
+
+          <TouchableOpacity onPress={() => {
+            // Reset the navigation stack and navigate to "Home"
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'Home' }],
+            });
+          }}>
+            <Text variant="titleLarge" style={[styles.title, { color: colors.text }]}>
+              Gedara
+            </Text>
+          </TouchableOpacity>
+
           <TouchableOpacity onPress={() => navigation.navigate('Login')}>
             <Ionicons name="person-circle-outline" size={30} color={colors.text} style={styles.icon} />
           </TouchableOpacity>
