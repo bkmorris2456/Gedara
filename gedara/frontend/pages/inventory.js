@@ -1,13 +1,18 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import Template from '../pages/template';
 import Card from '../components/card';
+import { Provider as PaperProvider, Text, Surface } from 'react-native-paper';
+import { theme } from '../theme';
 
 export default function Inventory({ navigation }) {
+
+  const { colors } = theme;
+
   return (
         <Template navigation={navigation}>
        
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: colors.primary }]}>
 
           <Text style={[styles.headers]}>Main Home</Text>
 

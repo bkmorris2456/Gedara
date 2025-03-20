@@ -18,7 +18,7 @@ export default function Home({ navigation }) {
 
         <ScrollView style={[styles.properties]} horizontal={true} showsHorizontalScrollIndicator={false}>
           <Card width={200} height={125} style={{ marginRight: 10 }}>
-            Property 1, last test before going abck to work
+            Property 1
           </Card>
           <Card width={200} height={125} style={{ marginRight: 10 }}>
             Property 2
