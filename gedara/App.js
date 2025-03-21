@@ -10,6 +10,9 @@ import Home from './frontend/pages/home';
 import Inventory from './frontend/pages/inventory';
 import Profile from './frontend/pages/settings';
 import Login from './frontend/pages/login';
+import HomeModal from './frontend/pages/creation-pages/homeModal';
+import RoomModal from './frontend/pages/creation-pages/roomModal';
+import ItemModal from './frontend/pages/creation-pages/itemModal';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();

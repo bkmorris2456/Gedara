@@ -1,42 +1,52 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import Template from '../pages/template';
 import Card from '../components/card';
-import { Provider as PaperProvider, Text, Surface } from 'react-native-paper';
+import { Provider as PaperProvider, Text, Surface, IconButton } from 'react-native-paper';
 import { theme } from '../theme';
+import MenuButton from '../components/MenuButton';
+import HomeModal from './creation-pages/homeModal';
+import RoomModal from './creation-pages/roomModal';
+import ItemModal from './creation-pages/itemModal';
 
 export default function Inventory({ navigation }) {
-
   const { colors } = theme;
+  const [selectedModal, setSelectedModal] = useState(null);
+
+  const handleMenuSelect = (option) => {
+    setSelectedModal(option);
+  };
 
   return (
-        <Template navigation={navigation}>
-       
-        <View style={[styles.container, { backgroundColor: colors.primary }]}>
+    <Template navigation={navigation}>
+      <View style={[styles.container, { backgroundColor: colors.primary }]}>
+        <MenuButton onSelect={handleMenuSelect} />
+        <Text style={[styles.headers]}>Main Home</Text>
 
-          <Text style={[styles.headers]}>Main Home</Text>
+        <Card width={300} height={100} style={{ marginBottom: 10 }}>
+          Main Property
+        </Card>
 
-          <Card width={300} height={100} style={{ marginBottom: 10 }}>
-            Main Property
-          </Card> 
+        <Text style={[styles.headers]}>Homes</Text>
 
-          <Text style={[styles.headers]}>Homes</Text>
+        <ScrollView style={[styles.properties]}>
+          <Card width={300} height={100} style={{ marginVertical: 10 }}>
+            Property 1
+          </Card>
+          <Card width={300} height={100} style={{ marginVertical: 10 }}>
+            Property 2
+          </Card>
+          <Card width={300} height={100} style={{ marginVertical: 10 }}>
+            Property 3
+          </Card>
+        </ScrollView>
 
-          <ScrollView style={[styles.properties]}>
-            <Card width={300} height={100} style={{ marginVertical: 10 }}>
-              Property 1
-            </Card>
-            <Card width={300} height={100} style={{ marginVertical: 10 }}>
-              Property 2
-            </Card>
-            <Card width={300} height={100} style={{ marginVertical: 10 }}>
-              Property 3
-            </Card>
-          </ScrollView>
-
-        </View>
-
-        </Template>
+        {/* Modals */}
+        <HomeModal visible={selectedModal === 'Home'} onClose={() => setSelectedModal(null)} />
+        <RoomModal visible={selectedModal === 'Room'} onClose={() => setSelectedModal(null)} />
+        <ItemModal visible={selectedModal === 'Item'} onClose={() => setSelectedModal(null)} />
+      </View>
+    </Template>
   );
 }
 
@@ -59,7 +69,4 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     width: '100%',
   },
-  cards: {
-    marginVertical: 10,
-  }
 });
