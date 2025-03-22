@@ -23,15 +23,15 @@ export default function Settings({ navigation }) {
         <View style={[styles.settings_form, { backgroundColor: colors.primary }]}>
 
           <TextInput style={[styles.inputs]}>
-            Full Name
+
           </TextInput>
 
           <TextInput style={[styles.inputs]}>
-            Email
+
           </TextInput>
 
           <TextInput style={[styles.inputs]}>
-            Password
+
           </TextInput>
 
 
