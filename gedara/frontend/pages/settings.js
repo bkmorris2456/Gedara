@@ -22,17 +22,33 @@ export default function Settings({ navigation }) {
 
         <View style={[styles.settings_form, { backgroundColor: colors.primary }]}>
 
-          <TextInput style={[styles.inputs]}>
+          <View>
 
-          </TextInput>
+            <Text style={styles.inputLabels}>Full Name</Text>
+            <TextInput style={[styles.inputs]}>
 
-          <TextInput style={[styles.inputs]}>
+            </TextInput>
 
-          </TextInput>
+          </View>
 
-          <TextInput style={[styles.inputs]}>
 
-          </TextInput>
+          <View>
+
+            <Text style={styles.inputLabels}>Email</Text>
+            <TextInput style={[styles.inputs]}>
+
+            </TextInput>
+
+          </View>
+
+          <View>
+
+            <Text>Password</Text>
+            <TextInput style={[styles.inputs]}>
+
+            </TextInput>
+
+          </View>
 
 
         </View>
@@ -73,5 +89,10 @@ const styles = StyleSheet.create({
     borderColor: "#fff",
     padding: 10,
     color: '#fff'
+  },
+  inputLabels: {
+    color: '#fff',
+    fontSize: 16,
+    margin: 10,
   }
 })
