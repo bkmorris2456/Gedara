@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView, TextInput } from 'react-native';
 import Template from '../pages/template';
-import { Provider as PaperProvider, Text, Surface } from 'react-native-paper';
+import { Provider as PaperProvider, Text, Surface, Button } from 'react-native-paper';
 import { theme } from '../theme';
 
 export default function Settings({ navigation }) {
@@ -22,7 +22,7 @@ export default function Settings({ navigation }) {
 
         <View style={[styles.settings_form, { backgroundColor: colors.primary }]}>
 
-          <View>
+          <View style={styles.inputContainers}>
 
             <Text style={styles.inputLabels}>Full Name</Text>
             <TextInput style={[styles.inputs]}>
@@ -32,7 +32,7 @@ export default function Settings({ navigation }) {
           </View>
 
 
-          <View>
+          <View style={styles.inputContainers}>
 
             <Text style={styles.inputLabels}>Email</Text>
             <TextInput style={[styles.inputs]}>
@@ -41,17 +41,35 @@ export default function Settings({ navigation }) {
 
           </View>
 
-          <View>
+          <View style={styles.inputContainers}>
 
-            <Text>Password</Text>
+            <Text style={styles.inputLabels}>Password</Text>
             <TextInput style={[styles.inputs]}>
 
             </TextInput>
 
           </View>
 
+          <View style={styles.buttonContainer}>
+
+            <Button
+              mode="contained"
+              onPress={() => console.log("Save pressed")}
+              style={styles.save}
+            >
+              Save
+            </Button>
+
+          </View>
+
 
         </View>
+
+        <Button
+          mode="contained"
+          onPress={() => navigation.navigate('Signup')}
+          style={styles.save}
+        />
 
       </View>
 
@@ -81,9 +99,11 @@ const styles = StyleSheet.create({
   settings_form: {
     width: '350',
     height: 'auto',
+    alignItems: 'center',
   },
   inputs: {
-    height: 50,
+    height: 40,
+    width: 300,
     margin: 15,
     borderWidth: 1,
     borderColor: "#fff",
@@ -93,6 +113,24 @@ const styles = StyleSheet.create({
   inputLabels: {
     color: '#fff',
     fontSize: 16,
+    marginLeft: 20,
+  },
+  inputContainers: {
+    marginVertical: 2,
+  },
+  buttonContainer: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginVertical: 20,
+  },
+  save: {
+    width: "80%",
+    height: 40,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
     margin: 10,
+    backgroundColor: "green"
   }
 })

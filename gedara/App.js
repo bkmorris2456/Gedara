@@ -10,6 +10,8 @@ import Home from './frontend/pages/home';
 import Inventory from './frontend/pages/inventory';
 import Settings from './frontend/pages/settings';
 import Login from './frontend/pages/login';
+import Signup from './frontend/pages/signup';
+// Import modals
 import HomeModal from './frontend/pages/creation-pages/homeModal';
 import RoomModal from './frontend/pages/creation-pages/roomModal';
 import ItemModal from './frontend/pages/creation-pages/itemModal';
@@ -47,6 +49,7 @@ export default function App() {
           <Stack.Screen name="MainApp" component={BottomTabs} />
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="Home" component={Home}/>
+          <Stack.Screen name="Signup" component={Signup} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
