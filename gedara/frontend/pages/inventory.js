@@ -20,7 +20,6 @@ export default function Inventory({ navigation }) {
   return (
     <Template navigation={navigation}>
       <View style={[styles.container, { backgroundColor: colors.primary }]}>
-        <MenuButton onSelect={handleMenuSelect} />
         <Text style={[styles.headers]}>Main Home</Text>
 
         <Card width={300} height={100} style={{ marginBottom: 10 }}>
@@ -41,10 +40,6 @@ export default function Inventory({ navigation }) {
           </Card>
         </ScrollView>
 
-        {/* Modals */}
-        <HomeModal visible={selectedModal === 'Home'} onClose={() => setSelectedModal(null)} />
-        <RoomModal visible={selectedModal === 'Room'} onClose={() => setSelectedModal(null)} />
-        <ItemModal visible={selectedModal === 'Item'} onClose={() => setSelectedModal(null)} />
       </View>
     </Template>
   );
@@ -59,13 +54,12 @@ const styles = StyleSheet.create({
   headers: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginVertical: 5,
+    marginVertical: 20,
     color: "#fff",
   },
   properties: {
     flexGrow: 1,
     maxHeight: 350,
-    marginVertical: 10,
     flexDirection: 'column',
     width: '100%',
   },

@@ -11,7 +11,11 @@ export default function Settings({ navigation }) {
   return (
     <Template navigation={navigation}>
       
-      <View style={[styles.main_container, { backgroundColor: colors.primary }]}>
+      <ScrollView 
+      contentContainerStyle={styles.scrollContainer}
+      showsVerticalScrollIndicator={false} // Hides the vertical scrollbar
+      showsHorizontalScrollIndicator={false} // Hides the horizontal scrollbar
+      >
 
         <Text style={styles.headers}>User Settings</Text>
 
@@ -69,22 +73,30 @@ export default function Settings({ navigation }) {
           mode="contained"
           onPress={() => navigation.navigate('Signup')}
           style={styles.save}
-        />
+        >
+          Navigate to Signup
+        </Button>
 
-      </View>
+        <Button
+          mode="contained"
+          onPress={() => navigation.navigate('Login')}
+          style={styles.save}
+        >
+          Navigate to Login
+        </Button>
+
+      </ScrollView>
 
     </Template>
   );
 }
 
 const styles = StyleSheet.create({
-  main_container: {
-    height: "auto",
-    flex: 1,
-    padding: 10,
-    display: "flex",
+  scrollContainer: {
+    flexGrow: 1, // Ensures the scroll view takes the full height
+    justifyContent: "center",
     alignItems: "center",
-
+    paddingVertical: 20, // Adds spacing for better scrolling experience
   },
   headers: {
     fontSize: 24,

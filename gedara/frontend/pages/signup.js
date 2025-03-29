@@ -36,7 +36,7 @@ export default function Login({ navigation }) {
 
                     <Button
                         mode="contained"
-                        onPress={() => console.log("Login Pressed")}
+                        onPress={() => navigation.navigate('Login')}
                         style={styles.signup_button}
                     >
                         Back to Login

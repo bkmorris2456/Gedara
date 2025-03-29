@@ -4,7 +4,7 @@ import { Provider as PaperProvider, Surface, Button } from 'react-native-paper';
 import Template from '../pages/template';
 import Card from '../components/card';
 
-export default function Login({ navigation }) {
+export default function Login({ navigation, children }) {
 
     const [email, onChangeEmail] = React.useState('Email');
     const [password, onChangePassword] = React.useState('Password');

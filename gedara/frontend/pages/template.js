@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -11,12 +11,24 @@ import Home from '../pages/home';
 import Inventory from '../pages/inventory';
 import Profile from '../pages/settings';
 
+// Import MenuButton and associated modals
+import MenuButton from '../components/MenuButton';
+import HomeModal from './creation-pages/homeModal';
+import RoomModal from './creation-pages/roomModal';
+import ItemModal from './creation-pages/itemModal';
+
 // Placeholder logo
 const logo = require('../../assets/favicon.png');
 const Tab = createBottomTabNavigator();
 
 const Template = ({ children, navigation }) => {
   const { colors } = theme;
+
+  const [selectedModal, setSelectedModal] = useState(null);
+
+  const handleMenuSelect = (option) => {
+    setSelectedModal(option);
+  };
 
   return (
     <PaperProvider theme={theme}>
@@ -37,15 +49,21 @@ const Template = ({ children, navigation }) => {
               Gedara
             </Text>
           </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+          
+          {/* original profile Icon to go to login page */}
+          {/* <TouchableOpacity onPress={() => navigation.navigate('Login')}>
             <Ionicons name="person-circle-outline" size={30} color={colors.text} style={styles.icon} />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
+          <MenuButton onSelect={handleMenuSelect} />
         </Surface>
 
         {/* Main Content */}
         <View style={[styles.content, { backgroundColor: colors.primary }]}>
           {children}
+          {/* Modals */}
+          <HomeModal visible={selectedModal === 'Home'} onClose={() => setSelectedModal(null)} />
+          <RoomModal visible={selectedModal === 'Room'} onClose={() => setSelectedModal(null)} />
+          <ItemModal visible={selectedModal === 'Item'} onClose={() => setSelectedModal(null)} />
         </View>
 
       </SafeAreaView>
@@ -57,12 +75,19 @@ const styles = StyleSheet.create({
   safeContainer: { flex: 1 },
   header: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'center',  // Ensures vertical alignment
     justifyContent: 'space-between',
-    padding: 15,
+    paddingHorizontal: 10,
+    paddingVertical: 8,  // Reduce vertical padding to shrink height
+    height: 60,  // Set explicit height to reduce header size
   },
   logo: { width: 40, height: 40, resizeMode: 'contain' },
-  title: { flex: 1, textAlign: 'center' },
+  title: { 
+    flex: 1,  
+    textAlign: 'center',
+    fontSize: 20,  // Slightly adjust font size for better balance
+    fontWeight: 'bold',
+  },
   icon: { marginRight: 10 },
   content: { flex: 1, padding: 20, marginTop: 10 },
 });
