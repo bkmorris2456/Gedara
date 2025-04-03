@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "17964960877",
+    "firebase_url": "https://gedara-efb76-default-rtdb.firebaseio.com",
+    "project_id": "gedara-efb76",
+    "storage_bucket": "gedara-efb76.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:17964960877:android:1c06700dff18eba8624364",
+        "android_client_info": {
+          "package_name": "com.company.gedara"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAqjr62WXYLdwoiVG0Sd4GR3DpSsJbKHBM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
