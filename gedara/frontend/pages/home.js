@@ -79,21 +79,22 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     fontSize: 20,
     fontWeight: 'bold',
+    marginVertical: 15,
    }, // Default text color
   properties: {
-    marginVertical: 15,
+    marginTop: 5,
     flexGrow: 1,
-    maxHeight: 200, // Limit height for the properties section
+    maxHeight: 125, // Limit height for the properties section
   },
   recent: {
-    marginVertical: 15,
+    marginVertical: 5,
     flexGrow: 1,
-    maxHeight: 215, // Limit height for the recent properties section
+    maxHeight: 100, // Limit height for the recent properties section
     overflow: 'hidden', // Hide overflow to prevent scrollbars
   },
   summaries: {
     flexDirection: 'row',
-    marginVertical: 15,
+    marginVertical: 5,
     alignItems: 'center',
     justifyContent: 'center',
   }
