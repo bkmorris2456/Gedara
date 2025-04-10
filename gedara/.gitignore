@@ -34,3 +34,11 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+# Firebase Configuration
+FIREBASE_API_KEY = AIzaSyCdSrGg28SyBl0r9lbF-qdUHk5Bp_YBM0w
+FIREBASE_AUTH_DOMAIN = gedara-efb76.firebaseapp.com
+FIREBASE_PROJECT_ID = gedara-efb76
+FIREBASE_STORAGE_BUCKET = gedara-efb76.appspot.com
+FIREBASE_MESSAGING_SENDER_ID = 17964960877
+FIREBASE_APP_ID = 1:17964960877:web:009d9da891535552624364
