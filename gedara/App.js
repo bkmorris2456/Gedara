@@ -16,6 +16,15 @@ import HomeModal from './frontend/pages/creation-pages/homeModal';
 import RoomModal from './frontend/pages/creation-pages/roomModal';
 import ItemModal from './frontend/pages/creation-pages/itemModal';
 
+// Import auth provider
+import { AuthProvider } from './src/context/AuthContext';
+
+// Ignore specific Firebase warnings that are not critical
+LogBox.ignoreLogs([
+  'Setting a timer',
+  'AsyncStorage has been extracted from react-native core',
+]);
+
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
@@ -45,7 +54,7 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <NavigationContainer theme={theme}>
-       <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="MainApp" component={BottomTabs} />
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="Home" component={Home}/>
