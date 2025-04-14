@@ -1,14 +1,38 @@
+import { db } from '../../config';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, useColorScheme, TextInput } from 'react-native';
 import { Provider as PaperProvider, Surface, Button } from 'react-native-paper';
 import Template from '../pages/template';
 import Card from '../components/card';
 
-export default function Login({ navigation }) {
 
-    const [email, onChangeEmail] = React.useState('Email');
-    const [password, onChangePassword] = React.useState('Password');
-    const [name, onChangeName] = React.useState('Name');
+export default function Signup({ navigation }) {
+
+    const todoRef = collection(db, 'users');
+    const [email, onChangeEmail] = React.useState('');
+    const [password, onChangePassword] = React.useState('');
+    const [name, onChangeName] = React.useState('');
+
+    const addUser = async () => {
+        if (name && email && password) {
+            try {
+                await addDoc(todoRef, {
+                    name,
+                    email,
+                    password,
+                    createdAt: serverTimestamp(),
+                });
+                onChangeName('');
+                onChangeEmail('');
+                onChangePassword('');
+            } catch (error) {
+                alert(error.message);
+            }
+        } else {
+            alert("Please fill out all fields.");
+        }
+    };
 
     return (
         <Template navigation={navigation}>
@@ -22,13 +46,38 @@ export default function Login({ navigation }) {
                 <View style={styles.info_organizer}>
 
                     <Text style={styles.login_text}>Sign Up!</Text>
-                    <TextInput style={styles.input} onChangeText={onChangeName} value={name} />
-                    <TextInput style={styles.input} onChangeText={onChangeEmail} value={email} />
-                    <TextInput style={styles.input} onChangeText={onChangePassword} value={password} />
+                    <TextInput 
+                        style={styles.input}
+                        placeholder="Full Name"
+                        value={name}
+                        onChangeText={(text) => onChangeName(text)}
+                        multiline={false}
+                        underlineColorAndroid={'transparent'}
+                        autoCapitalize='none'
+                    />
+                    <TextInput 
+                        style={styles.input}
+                        placeholder="Email"
+                        value={email}
+                        onChangeText={(text) => onChangeEmail(text)}
+                        multiline={false}
+                        underlineColorAndroid={'transparent'}
+                        autoCapitalize='none'
+                    />
+                    <TextInput 
+                        style={styles.input}
+                        placeholder="Password"
+                        value={password}
+                        onChangeText={(text) => onChangePassword(text)}
+                        secureTextEntry={true}
+                        multiline={false}
+                        underlineColorAndroid={'transparent'}
+                        autoCapitalize='none'
+                    />
 
                     <Button
                     mode="contained"
-                    onPress={() => console.log("Save pressed")}
+                    onPress={addUser}
                     style={styles.save}
                     >
                         Sign Up
@@ -77,7 +126,7 @@ const styles = StyleSheet.create({
         borderColor: "#fff",
         padding: 10,
         color: '#fff',
-        width: '275',
+        width: 275,
     },
     login_text: {
         display: 'flex',

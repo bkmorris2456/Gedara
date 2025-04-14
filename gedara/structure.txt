@@ -1,0 +1,15 @@
+users (collection)
+  └── {uid} (document)
+        ├── name: "John Doe"
+        ├── email: "john@example.com"
+        ├── ...
+        └── houses (subcollection)
+              └── {houseId}
+                    ├── address: "123 Main St"
+                    └── rooms (subcollection)
+                          └── {roomId}
+                                ├── name: "Living Room"
+                                └── items (subcollection)
+                                      └── {itemId}
+                                            ├── name: "TV"
+                                            └── value: "$500"
