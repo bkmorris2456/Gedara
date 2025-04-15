@@ -13,7 +13,20 @@
           "package_name": "com.company.gedara"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "17964960877-9t7i5ma8lu8f6n92l0728u9m28t02p4o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.company.gedara",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "17964960877-pen4g0eo7agtfk37r710ldjhskbgm4a5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAqjr62WXYLdwoiVG0Sd4GR3DpSsJbKHBM"
@@ -21,7 +34,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "17964960877-pen4g0eo7agtfk37r710ldjhskbgm4a5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "17964960877-bh44brcauagvu1ernjjhcdk3ifflc1jt.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.gedara"
+              }
+            }
+          ]
         }
       }
     }

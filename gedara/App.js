@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavigationContainer, DarkTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import auth, {FirebaseAuthtypes } from '@react-native-firebase/auth';
 
 // Import screens
 import Home from './frontend/pages/home';
@@ -15,6 +16,7 @@ import Signup from './frontend/pages/signup';
 import HomeModal from './frontend/pages/creation-pages/homeModal';
 import RoomModal from './frontend/pages/creation-pages/roomModal';
 import ItemModal from './frontend/pages/creation-pages/itemModal';
+import { useSegments } from 'expo-router';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();

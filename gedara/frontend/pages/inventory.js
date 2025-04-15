@@ -23,20 +23,20 @@ export default function Inventory({ navigation }) {
         <Text style={[styles.headers]}>Main Home</Text>
 
         <Card width={300} height={100} style={{ marginBottom: 10 }}>
-          Main Property
+          <Text style={styles.general_text}>Main Property</Text>
         </Card>
 
         <Text style={[styles.headers]}>Homes</Text>
 
         <ScrollView style={[styles.properties]}>
           <Card width={300} height={100} style={{ marginVertical: 10 }}>
-            Property 1
+            <Text style={styles.general_text}>Property 1</Text>
           </Card>
           <Card width={300} height={100} style={{ marginVertical: 10 }}>
-            Property 2
+            <Text style={styles.general_text}>Property 2</Text>
           </Card>
           <Card width={300} height={100} style={{ marginVertical: 10 }}>
-            Property 3
+            <Text style={styles.general_text}>Property 3</Text>
           </Card>
         </ScrollView>
 
@@ -63,4 +63,8 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     width: '100%',
   },
+  general_text: {
+    color: '#fff',
+    fontSize: 16,
+  }
 });

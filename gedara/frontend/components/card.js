@@ -16,7 +16,7 @@ const Card = ({ width, height, children, style, variant = 'dark' }) => {
       style
     ]}>
       {/* Ensures all direct text inside Card is white */}
-      <Text style={styles.text}>{children}</Text>
+      {children}
     </View>
   );
 };

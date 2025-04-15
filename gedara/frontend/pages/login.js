@@ -3,11 +3,39 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, useColorScheme, TextIn
 import { Provider as PaperProvider, Surface, Button } from 'react-native-paper';
 import Template from '../pages/template';
 import Card from '../components/card';
+import auth from '@react-native-firebase/auth';
 
 export default function Login({ navigation, children }) {
 
-    const [email, onChangeEmail] = React.useState('Email');
-    const [password, onChangePassword] = React.useState('Password');
+    const [email, onChangeEmail] = React.useState('');
+    const [password, onChangePassword] = React.useState('');
+    const [loading, setLoading] = React.useState(false);
+
+    const signUp = async () => {
+        setLoading(true);
+        try {
+            await auth().createUserWithEmailAndPassword(email, password);
+            alert('Check your emails!!');
+        } catch (error) {
+            const err = error.code;
+            alert('Registration failed: ' + err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const signIn = async () => {
+        setLoading(true);
+        try {
+            await auth().signInWithEmailAndPassword(email, password);
+            alert('Login successful!');
+        } catch (error) {
+            const err = error.code;
+            alert('Login failed: ' + err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <Template navigation={navigation}>

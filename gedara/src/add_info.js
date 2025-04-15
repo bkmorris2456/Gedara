@@ -1,4 +1,5 @@
-import { db } from '../../config';
+// Imports
+import { db } from '../../config'; // Import database
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import React from 'react';
 import {
@@ -15,8 +16,9 @@ import { Button } from 'react-native-paper';
 import Template from '../pages/template';
 import Card from '../components/card';
 
+// Following example is from signup.js
 export default function Signup({ navigation }) {
-    const todoRef = collection(db, 'users');
+    const todoRef = collection(db, 'users'); // variable that determines that information we'll be added to users document
     const [email, onChangeEmail] = React.useState('');
     const [password, onChangePassword] = React.useState('');
     const [name, onChangeName] = React.useState('');

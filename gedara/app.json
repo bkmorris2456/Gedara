@@ -29,15 +29,17 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "@react-native-firebase/app",
-      [
-        "expo-build-properties",
-        {
-          "ios": {
-            "useFrameworks": "static"
-          }
+      "expo-router",
+      ["expo-build-properties", {
+        "ios": {
+          "useFrameworks": "static"
         }
-      ]
-    ]
+      }],
+      "@react-native-firebase/app",
+      "@react-native-firebase/auth"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
   }
 }

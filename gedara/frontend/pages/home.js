@@ -18,13 +18,13 @@ export default function Home({ navigation }) {
 
         <ScrollView style={[styles.properties]} horizontal={true} showsHorizontalScrollIndicator={false}>
           <Card width={200} height={125} style={{ marginRight: 10 }}>
-            Property 1
+            <Text style={styles.general_text}>Property</Text>
           </Card>
           <Card width={200} height={125} style={{ marginRight: 10 }}>
-            Property 2
+            <Text style={styles.general_text}>Property</Text>
           </Card>
           <Card width={200} height={125} style={{ marginRight: 10 }}>
-            Property 3
+            <Text style={styles.general_text}>Property</Text>
           </Card>
         </ScrollView>
 
@@ -32,19 +32,19 @@ export default function Home({ navigation }) {
 
         <ScrollView style={styles.recent} horizontal={false} showsVerticalScrollIndicator={false}>
           <Card width={325} height={100} style={{ marginBottom: 10 }}>
-            Recently Added Property 1
+            <Text style={styles.general_text}>Property</Text>
           </Card>
           <Card width={325} height={100} style={{ marginBottom: 10 }}>
-            Recently Added Property 2
+            <Text style={styles.general_text}>Property</Text>
           </Card>
           <Card width={325} height={100} style={{ marginBottom: 10 }}>
-            Recently Added Property 3
+            <Text style={styles.general_text}>Property</Text>
           </Card>
           <Card width={325} height={100} style={{ marginBottom: 10 }}>
-            Recently Added Property 4
+            <Text style={styles.general_text}>Property</Text>
           </Card>
           <Card width={325} height={100} style={{ marginBottom: 10 }}>
-            Recently Added Property 5
+            <Text style={styles.general_text}>Property</Text>
           </Card>
         </ScrollView>
 
@@ -52,13 +52,13 @@ export default function Home({ navigation }) {
 
         <View style={styles.summaries}>
           <Card width={110} height={100} style={{ marginRight: 10 }}>
-            Total Items
+            <Text style={styles.general_text}>Total Items</Text>
           </Card>
           <Card width={110} height={100} style={{ marginRight: 10 }}>
-            Categories
+            <Text style={styles.general_text}>Total Rooms</Text>
           </Card>
           <Card width={110} height={100} style={{ marginRight: 10 }}>
-            Total Value
+            <Text style={styles.general_text}>Total Value</Text>
           </Card>
         </View>
 
@@ -97,6 +97,10 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  general_text: {
+    color: '#fff',
+    fontSize: 16,
   }
 
 });

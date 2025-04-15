@@ -1,0 +1,37 @@
+diff --git a/node_modules/react-native-appearance/android/build.gradle b/node_modules/react-native-appearance/android/build.gradle
+index 57d3f80..655e627 100644
+--- a/node_modules/react-native-appearance/android/build.gradle
++++ b/node_modules/react-native-appearance/android/build.gradle
+@@ -20,7 +20,10 @@ buildscript {
+ }
+ 
+ apply plugin: 'com.android.library'
+-apply plugin: 'maven'
++
++plugins {
++    id 'maven-publish'
++}
+ 
+ // Matches values in recent template from React Native 0.59 / 0.60
+ // https://github.com/facebook/react-native/blob/0.59-stable/template/android/build.gradle#L5-L9
+@@ -31,14 +34,16 @@ def DEFAULT_MIN_SDK_VERSION = 16
+ def DEFAULT_TARGET_SDK_VERSION = 28
+ 
+ android {
+-    compileSdkVersion safeExtGet('compileSdkVersion', DEFAULT_COMPILE_SDK_VERSION)
+-    buildToolsVersion safeExtGet('buildToolsVersion', DEFAULT_BUILD_TOOLS_VERSION)
++    compileSdkVersion 33
++    buildToolsVersion "33.0.2"
++
+     defaultConfig {
+-        minSdkVersion safeExtGet('minSdkVersion', DEFAULT_MIN_SDK_VERSION)
+-        targetSdkVersion safeExtGet('targetSdkVersion', DEFAULT_TARGET_SDK_VERSION)
++        minSdkVersion 24
++        targetSdkVersion 33
+         versionCode 1
+         versionName "1.0"
+     }
++
+     lintOptions {
+         abortOnError false
+     }
