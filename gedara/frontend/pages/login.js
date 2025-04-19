@@ -65,7 +65,7 @@ export default function Login({ navigation, children }) {
                                 <Text style={styles.intro_text}>Welcome to Gedara</Text>
                             </View>
 
-                            <Card style={[StyleSheet.login_container]} width="100%">
+                            <Card style={styles.login_container} width="100%">
 
                                 <View style={styles.info_organizer}>
 
@@ -112,7 +112,8 @@ const styles = StyleSheet.create({
     },
     intro_text: {
         padding: 20,
-        marginBottom: 10,
+        marginBottom: 5,
+        marginTop: 50,
         color: "#fff",
         alignItems: 'center',
         fontSize: 24,

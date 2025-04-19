@@ -130,7 +130,8 @@ const styles = StyleSheet.create({
     },
     intro_text: {
         padding: 20,
-        marginBottom: 10,
+        marginBottom: 5,
+        marginTop: 50,
         color: "#fff",
         alignItems: 'center',
         fontSize: 24,

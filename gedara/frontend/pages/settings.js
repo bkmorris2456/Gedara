@@ -61,7 +61,7 @@ export default function Settings({ navigation }) {
               onPress={() => console.log("Save pressed")}
               style={styles.save}
             >
-              Save Changes
+              <Text>Save Changes</Text>
             </Button>
 
           </View>
@@ -73,7 +73,7 @@ export default function Settings({ navigation }) {
           onPress={() => navigation.navigate('Signup')}
           style={styles.save}
         >
-          Navigate to Signup
+          <Text>Navigate to Signup</Text>
         </Button>
 
         <Button
@@ -81,7 +81,7 @@ export default function Settings({ navigation }) {
           onPress={() => navigation.navigate('Login')}
           style={styles.save}
         >
-          Navigate to Login
+          <Text>Navigate to Login</Text>
         </Button>
 
       </ScrollView>
@@ -136,12 +136,14 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   save: {
-    width: "80%",
+    width: "75%",
     height: 40,
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     margin: 10,
-    backgroundColor: "green"
+    backgroundColor: "white",
+    borderRadius: 2,
+    color: '#000',
   }
 })
