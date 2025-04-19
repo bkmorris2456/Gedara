@@ -15,7 +15,10 @@
     "ios": {
       "googleServicesFile": "./GoogleService-Info.plist",
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.gedara"
+      "bundleIdentifier": "com.anonymous.gedara",
+      "runtimeVersion": {
+        "policy": "appVersion"
+      }
     },
     "android": {
       "googleServicesFile": "./google-services.json",
@@ -23,7 +26,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.gedara"
+      "package": "com.anonymous.gedara",
+      "runtimeVersion": "1.0.0"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -51,6 +55,9 @@
       "eas": {
         "projectId": "8b007200-1182-48b2-bad6-fbde471e252b"
       }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/8b007200-1182-48b2-bad6-fbde471e252b"
     }
   }
 }

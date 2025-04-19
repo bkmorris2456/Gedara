@@ -1,7 +1,18 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, useColorScheme, TextInput } from 'react-native';
+import { 
+    View, 
+    Text, 
+    StyleSheet, 
+    Image, 
+    TouchableOpacity, 
+    useColorScheme, 
+    TextInput,
+    KeyboardAvoidingView,
+    TouchableWithoutFeedback,
+    Keyboard,
+    Platform,
+} from 'react-native';
 import { Provider as PaperProvider, Surface, Button } from 'react-native-paper';
-import Template from '../pages/template';
 import Card from '../components/card';
 import { auth } from '../../config';
 import { signInWithEmailAndPassword } from 'firebase/auth';
@@ -12,6 +23,7 @@ export default function Login({ navigation, children }) {
     const [password, onChangePassword] = React.useState('');
     const [loading, setLoading] = React.useState(false);
 
+    // Function that handles verification of user login using given data
     const signIn = async () => {
         try {
             await signInWithEmailAndPassword(auth, email, password);
@@ -35,98 +47,111 @@ export default function Login({ navigation, children }) {
     };
 
     return (
-        <Template navigation={navigation}>
+        <PaperProvider>
+            <View style={styles.container}>
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === "ios" ? "padding" : "height"}
+                    style={{ flex: 1 }}
+                >
+                    <TouchableWithoutFeedback
+                    onPress={() => {
+                        if (Platform.OS !== 'web') {
+                        Keyboard.dismiss();
+                        }
+                    }}
+                    >
+                        <View style={{ flex: 1 }}>
+                            <View style={styles.intro_text}>
+                                <Text style={styles.intro_text}>Welcome to Gedara</Text>
+                            </View>
 
-            <View style={styles.intro_text}>
-                <Text style={styles.intro_text}>Welcome to Gedara</Text>
+                            <Card style={[StyleSheet.login_container]} width="100%">
+
+                                <View style={styles.info_organizer}>
+
+                                    <Text style={styles.login_text}>Login</Text>
+                                    <Text style={styles.text}>Email</Text>
+                                    <TextInput style={styles.input} onChangeText={onChangeEmail} value={email} />
+                                    <Text style={styles.text}>Password</Text>
+                                    <TextInput style={styles.input} onChangeText={onChangePassword} value={password} />
+
+                                    <Button
+                                    mode="contained"
+                                    onPress={() => signIn()}
+                                    style={styles.save}
+                                    >
+                                        Login
+                                    </Button>
+
+                                    <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 15 }}>
+                                        <Text style={styles.text}>Don't have an account? </Text>
+                                        <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+                                            <Text style={[styles.text, { color: '#1079AA' }]}>Sign Up</Text>
+                                        </TouchableOpacity>
+                                    </View>
+
+
+                                </View>
+
+                            </Card>
+                        </View>
+                    </TouchableWithoutFeedback>
+                </KeyboardAvoidingView>
             </View>
-
-            <Card style={[StyleSheet.login_container]} width="100%" height={600}>
-
-                <View style={styles.info_organizer}>
-
-                    <Text style={styles.login_text}>Login</Text>
-                    <Text>Email</Text>
-                    <TextInput style={styles.input} onChangeText={onChangeEmail} value={email} />
-                    <Text>Password</Text>
-                    <TextInput style={styles.input} onChangeText={onChangePassword} value={password} />
-
-                    <Button
-                    mode="contained"
-                    onPress={() => signIn()}
-                    style={styles.save}
-                    >
-                        Save
-                    </Button>
-
-                    <Button
-                        mode="contained"
-                        onPress={() => navigation.navigate('Signup')}
-                        style={styles.signup_button}
-                    >
-                        Sign Up
-                    </Button>
-
-
-                </View>
-
-            </Card>
-            
-        </Template>
+        </PaperProvider>
+        
     );
 };
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#121212',
+        padding: 20,
+        justifyContent: 'center',
+    },
     intro_text: {
-        display: 'flex',
         padding: 20,
         marginBottom: 10,
         color: "#fff",
         alignItems: 'center',
         fontSize: 24,
+        textAlign: 'center',
     },
     login_container: {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
+        padding: 20,
     },
     info_organizer: {
-        padding: 20,
-        marginBottom: 25,
-        color: '#fff',
+        width: '100%',
     },
     input: {
         height: 40,
-        marginVertical: 20,
+        marginVertical: 10,
         borderWidth: 1,
         borderColor: "#fff",
         padding: 10,
         color: '#fff',
-        width: 275,
-        autoCapitalize: 'none',
+        width: '100%',
     },
     login_text: {
-        display: 'flex',
         color: '#fff',
         fontSize: 24,
         marginBottom: 20,
-        justifyContent: 'center',
+        textAlign: 'center',
     },
     save: {
-        width: "100%",
         height: 40,
-        display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "green",
+        backgroundColor: "white",
         marginTop: 20,
+        borderRadius: 2,
+        color: '#000',
     },
-    signup_button: {
-        width: "100%",
-        height: 40,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        marginTop: 20,
-    },
+    text: {
+        color: '#fff',
+    }
 });

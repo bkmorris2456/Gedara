@@ -61,11 +61,10 @@ export default function Settings({ navigation }) {
               onPress={() => console.log("Save pressed")}
               style={styles.save}
             >
-              Save
+              Save Changes
             </Button>
 
           </View>
-
 
         </View>
 

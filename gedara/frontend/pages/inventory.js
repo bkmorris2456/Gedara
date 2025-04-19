@@ -20,11 +20,6 @@ export default function Inventory({ navigation }) {
   return (
     <Template navigation={navigation}>
       <View style={[styles.container, { backgroundColor: colors.primary }]}>
-        <Text style={[styles.headers]}>Main Home</Text>
-
-        <Card width={300} height={100} style={{ marginBottom: 10 }}>
-          <Text style={styles.general_text}>Main Property</Text>
-        </Card>
 
         <Text style={[styles.headers]}>Homes</Text>
 
@@ -49,8 +44,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    maxHeight: "auto",
-  },
+    maxHeight: "auto", 
+   },
   headers: {
     fontSize: 24,
     fontWeight: 'bold',

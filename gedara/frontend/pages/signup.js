@@ -1,5 +1,5 @@
 import { auth, db } from '../../config';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import React from 'react';
 import {
@@ -12,12 +12,10 @@ import {
     Platform,
     TextInput
 } from 'react-native';
-import { Button } from 'react-native-paper';
-import Template from '../pages/template';
+import { Button, PaperProvider } from 'react-native-paper';
 import Card from '../components/card';
 
 export default function Signup({ navigation }) {
-    const todoRef = collection(db, 'users');
     const [email, onChangeEmail] = React.useState('');
     const [password, onChangePassword] = React.useState('');
     const [name, onChangeName] = React.useState('');
@@ -53,75 +51,83 @@ export default function Signup({ navigation }) {
     };
 
     return (
-        <Template navigation={navigation}>
-            <KeyboardAvoidingView
-                behavior={Platform.OS === "ios" ? "padding" : "height"}
-                style={{ flex: 1 }}
-            >
-                <TouchableWithoutFeedback
-                onPress={() => {
-                    if (Platform.OS !== 'web') {
-                    Keyboard.dismiss();
-                    }
-                }}
+        <PaperProvider>
+            <View style={styles.container}>
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === "ios" ? "padding" : "height"}
+                    style={{ flex: 1 }}
                 >
-                    <View style={{ flex: 1 }}>
-                        <View style={styles.intro_text}>
-                            <Text style={styles.intro_text}>Welcome to Gedara</Text>
-                        </View>
-
-                        <Card style={styles.login_container} width="100%">
-                            <View style={styles.info_organizer}>
-                                <Text style={styles.login_text}>Sign Up!</Text>
-
-                                <Text style={{ color: '#fff' }}>Name</Text>
-                                <TextInput
-                                    style={styles.input}
-                                    value={name}
-                                    onChangeText={onChangeName}
-                                    autoCapitalize='none'
-                                />
-                                <Text style={{ color: '#fff' }}>Email</Text>
-                                <TextInput
-                                    style={styles.input}
-                                    value={email}
-                                    onChangeText={onChangeEmail}
-                                    autoCapitalize='none'
-                                />
-                                <Text style={{ color: '#fff' }}>Password</Text>
-                                <TextInput
-                                    style={styles.input}
-                                    value={password}
-                                    onChangeText={onChangePassword}
-                                    secureTextEntry={true}
-                                    autoCapitalize='none'
-                                />
-
-                                <Button
-                                    mode="contained"
-                                    onPress={addUser}
-                                    style={styles.save}
-                                >
-                                    Sign Up
-                                </Button>
-
-                                <Button
-                                    mode="contained"
-                                    onPress={() => navigation.navigate('Login')}
-                                    style={styles.signup_button}
-                                >
-                                    Back to Login
-                                </Button>
+                    <TouchableWithoutFeedback
+                    onPress={() => {
+                        if (Platform.OS !== 'web') {
+                        Keyboard.dismiss();
+                        }
+                    }}
+                    >
+                        <View style={{ flex: 1 }}>
+                            <View style={styles.intro_text}>
+                                <Text style={styles.intro_text}>Welcome to Gedara</Text>
                             </View>
-                        </Card>
-                    </View>
-                </TouchableWithoutFeedback>
-            </KeyboardAvoidingView>
-        </Template>
+
+                            <Card style={styles.login_container} width="100%">
+                                <View style={styles.info_organizer}>
+                                    <Text style={styles.login_text}>Sign Up!</Text>
+
+                                    <Text style={{ color: '#fff' }}>Name</Text>
+                                    <TextInput
+                                        style={styles.input}
+                                        value={name}
+                                        onChangeText={onChangeName}
+                                        autoCapitalize='none'
+                                    />
+                                    <Text style={{ color: '#fff' }}>Email</Text>
+                                    <TextInput
+                                        style={styles.input}
+                                        value={email}
+                                        onChangeText={onChangeEmail}
+                                        autoCapitalize='none'
+                                    />
+                                    <Text style={{ color: '#fff' }}>Password</Text>
+                                    <TextInput
+                                        style={styles.input}
+                                        value={password}
+                                        onChangeText={onChangePassword}
+                                        secureTextEntry={true}
+                                        autoCapitalize='none'
+                                    />
+
+                                    <Button
+                                        mode="contained"
+                                        onPress={addUser}
+                                        style={styles.save}
+                                    >
+                                        Sign Up
+                                    </Button>
+
+                                    <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 15 }}>
+                                        <Text style={styles.text}>Already have an account? </Text>
+                                        <TouchableWithoutFeedback onPress={() => navigation.navigate('Login')}>
+                                            <Text style={[styles.text, { color: '#1079AA' }]}>Login</Text>
+                                        </TouchableWithoutFeedback>
+                                    </View>
+
+                                </View>
+                            </Card>
+                        </View>
+                    </TouchableWithoutFeedback>
+                </KeyboardAvoidingView>
+            </View>
+        </PaperProvider>
     );
 };
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#121212',
+        padding: 20,
+        justifyContent: 'center',
+    },
     intro_text: {
         padding: 20,
         marginBottom: 10,
@@ -158,13 +164,18 @@ const styles = StyleSheet.create({
         height: 40,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "green",
+        backgroundColor: "white",
         marginTop: 20,
+        borderRadius: 2,
+        color: '#000',
     },
     signup_button: {
         height: 40,
         justifyContent: "center",
         alignItems: "center",
         marginTop: 20,
+    },
+    text: {
+        color: '#fff',
     },
 });
