@@ -1,4 +1,5 @@
-import { db } from '../../config';
+import { auth, db } from '../../config';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import React from 'react';
 import {
@@ -22,23 +23,32 @@ export default function Signup({ navigation }) {
     const [name, onChangeName] = React.useState('');
 
     const addUser = async () => {
+
         if (name && email && password) {
             try {
-                await addDoc(todoRef, {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                console.log('User registered:');
+
+                await addDoc(collection(db, 'users'), {
+                    uid: user.uid,
                     name,
                     email,
-                    password,
                     createdAt: serverTimestamp(),
                 });
-                onChangeName('');
+
+                alert('Account created!');
                 onChangeEmail('');
                 onChangePassword('');
+                onChangeName('');
+                navigation.navigate('Login');
             } catch (error) {
-                alert(error.message);
+                alert("Signup failed: " + error.message);
             }
         } else {
-            alert("Please fill out all fields.");
+            alert("Please fill in all fields.");
         }
+
     };
 
     return (
@@ -47,7 +57,13 @@ export default function Signup({ navigation }) {
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
                 style={{ flex: 1 }}
             >
-                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                <TouchableWithoutFeedback
+                onPress={() => {
+                    if (Platform.OS !== 'web') {
+                    Keyboard.dismiss();
+                    }
+                }}
+                >
                     <View style={{ flex: 1 }}>
                         <View style={styles.intro_text}>
                             <Text style={styles.intro_text}>Welcome to Gedara</Text>
@@ -57,27 +73,26 @@ export default function Signup({ navigation }) {
                             <View style={styles.info_organizer}>
                                 <Text style={styles.login_text}>Sign Up!</Text>
 
+                                <Text style={{ color: '#fff' }}>Name</Text>
                                 <TextInput
                                     style={styles.input}
-                                    placeholder="Full Name"
                                     value={name}
                                     onChangeText={onChangeName}
                                     autoCapitalize='none'
                                 />
+                                <Text style={{ color: '#fff' }}>Email</Text>
                                 <TextInput
                                     style={styles.input}
-                                    placeholder="Email"
                                     value={email}
                                     onChangeText={onChangeEmail}
                                     autoCapitalize='none'
-                                    keyboardType="email-address"
                                 />
+                                <Text style={{ color: '#fff' }}>Password</Text>
                                 <TextInput
                                     style={styles.input}
-                                    placeholder="Password"
                                     value={password}
                                     onChangeText={onChangePassword}
-                                    secureTextEntry
+                                    secureTextEntry={true}
                                     autoCapitalize='none'
                                 />
 

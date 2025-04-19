@@ -44,12 +44,14 @@ export default function Login({ navigation, children }) {
                 <Text style={styles.intro_text}>Welcome to Gedara</Text>
             </View>
 
-            <Card style={[StyleSheet.login_container]} width="100%" height={450}>
+            <Card style={[StyleSheet.login_container]} width="100%" height={600}>
 
                 <View style={styles.info_organizer}>
 
                     <Text style={styles.login_text}>Login</Text>
+                    <Text>Email</Text>
                     <TextInput style={styles.input} onChangeText={onChangeEmail} value={email} />
+                    <Text>Password</Text>
                     <TextInput style={styles.input} onChangeText={onChangePassword} value={password} />
 
                     <Button
@@ -103,7 +105,7 @@ const styles = StyleSheet.create({
         borderColor: "#fff",
         padding: 10,
         color: '#fff',
-        width: '275',
+        width: 275,
     },
     login_text: {
         display: 'flex',
