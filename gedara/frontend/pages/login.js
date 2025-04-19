@@ -124,6 +124,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
+        width: '100%',
+        
     },
     info_organizer: {
         width: '100%',
@@ -151,6 +153,7 @@ const styles = StyleSheet.create({
         marginTop: 20,
         borderRadius: 2,
         color: '#000',
+        width: '100%',
     },
     text: {
         color: '#fff',

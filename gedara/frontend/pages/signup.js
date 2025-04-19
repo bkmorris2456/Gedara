@@ -169,6 +169,7 @@ const styles = StyleSheet.create({
         marginTop: 20,
         borderRadius: 2,
         color: '#000',
+        width: '100%',
     },
     signup_button: {
         height: 40,

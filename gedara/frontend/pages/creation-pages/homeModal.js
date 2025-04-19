@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Modal, StyleSheet } from 'react-native';
+import { 
+  View, 
+  Text, 
+  TextInput, 
+  Button, 
+  Modal, 
+  StyleSheet } from 'react-native';
 import { Provider as PaperProvider, Surface } from 'react-native-paper';
 import { theme } from '../../theme';
+import { auth, db } from '../../../config';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const HomeModal = ({ visible, onClose }) => {
   const [homeName, setHomeName] = useState('');
@@ -9,6 +17,29 @@ const HomeModal = ({ visible, onClose }) => {
   const [houseValue, setHouseValue] = useState('');
 
   const { colors } = theme;
+
+  // Function that will add home using Home Modal Form
+  const addHome = async () => {
+    try {
+      if (homeName && roomTotal && houseValue) {
+        await addDoc(collection(db, 'homes'), {
+          homeName,
+          roomTotal,
+          houseValue,
+          createdAt: serverTimestamp(),
+        });
+        alert('Home added!');
+        setHomeName('');
+        setRoomTotal('');
+        setHouseValue('');
+        onClose();
+      } else {
+        alert('Please fill in all fields.');
+      }
+    } catch (error) {
+      alert('Error adding home: ' + error.message);
+    }
+  };
 
   return (
     <Modal visible={visible} animationType="fade" transparent>
@@ -38,7 +69,7 @@ const HomeModal = ({ visible, onClose }) => {
           />
           <View style={styles.buttonStructure}>
             <Button title="Close" onPress={onClose} color="red" />
-            <Button title="Submit" onPress={onClose} />
+            <Button title="Submit" onPress={addHome} />
           </View>
         </View>
       </View>
@@ -71,7 +102,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     marginVertical: 15,
     padding: 5,
-    color: '#000',
+    color: '#fff',
     borderColor: 'white',
   },
   buttonStructure: {

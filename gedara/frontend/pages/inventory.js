@@ -23,7 +23,7 @@ export default function Inventory({ navigation }) {
 
         <Text style={[styles.headers]}>Homes</Text>
 
-        <ScrollView style={[styles.properties]}>
+        <ScrollView style={[styles.properties]} showsVerticalScrollIndicator={false}>
           <Card width={300} height={100} style={{ marginVertical: 10 }}>
             <Text style={styles.general_text}>Property 1</Text>
           </Card>
@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
   headers: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginVertical: 20,
+    marginVertical: 15,
     color: "#fff",
   },
   properties: {

@@ -17,13 +17,13 @@ export default function Home({ navigation }) {
         <Text style={[styles.headers]}>My Properties</Text>
 
         <ScrollView style={[styles.properties]} horizontal={true} showsHorizontalScrollIndicator={false}>
-          <Card width={200} height={125} style={{ marginRight: 10 }}>
+          <Card width={180} height={125} style={{ marginRight: 10 }}>
             <Text style={styles.general_text}>Property</Text>
           </Card>
-          <Card width={200} height={125} style={{ marginRight: 10 }}>
+          <Card width={180} height={125} style={{ marginRight: 10 }}>
             <Text style={styles.general_text}>Property</Text>
           </Card>
-          <Card width={200} height={125} style={{ marginRight: 10 }}>
+          <Card width={180} height={125} style={{ marginRight: 10 }}>
             <Text style={styles.general_text}>Property</Text>
           </Card>
         </ScrollView>
@@ -51,13 +51,13 @@ export default function Home({ navigation }) {
         <Text style={[styles.headers]}>Inventory Value</Text>
 
         <View style={styles.summaries}>
-          <Card width={110} height={100} style={{ marginRight: 10 }}>
+          <Card width={120} height={100} style={{ marginRight: 10 }}>
             <Text style={styles.general_text}>Total Items</Text>
           </Card>
-          <Card width={110} height={100} style={{ marginRight: 10 }}>
+          <Card width={120} height={100} style={{ marginRight: 10 }}>
             <Text style={styles.general_text}>Total Rooms</Text>
           </Card>
-          <Card width={110} height={100} style={{ marginRight: 10 }}>
+          <Card width={120} height={100} style={{ marginRight: 10 }}>
             <Text style={styles.general_text}>Total Value</Text>
           </Card>
         </View>
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   recent: {
     marginVertical: 5,
     flexGrow: 1,
-    maxHeight: 100, // Limit height for the recent properties section
+    maxHeight: 325, // Limit height for the recent properties section
     overflow: 'hidden', // Hide overflow to prevent scrollbars
   },
   summaries: {
@@ -99,8 +99,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   general_text: {
+    flex: 1,
+    textAlign: 'center',
     color: '#fff',
-    fontSize: 16,
+    fontSize: 15,
   }
 
 });
