@@ -34,6 +34,7 @@ export default function Signup({ navigation }) {
                     uid: user.uid,
                     name,
                     email,
+                    password,
                     createdAt: serverTimestamp(),
                 });
 
