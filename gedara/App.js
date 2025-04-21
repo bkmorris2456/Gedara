@@ -4,7 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import auth, {FirebaseAuthtypes } from '@react-native-firebase/auth';
+import auth, { FirebaseAuthtypes } from '@react-native-firebase/auth';
 
 // Import screens
 import Home from './frontend/pages/home';
@@ -17,6 +17,8 @@ import HomeModal from './frontend/pages/creation-pages/homeModal';
 import RoomModal from './frontend/pages/creation-pages/roomModal';
 import ItemModal from './frontend/pages/creation-pages/itemModal';
 import { useSegments } from 'expo-router';
+import { AuthProvider } from './firebase/AuthContext';
+import RootNavigator from './frontend/components/RootNavigator';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -45,15 +47,14 @@ export default function App() {
   const [theme, setTheme] = useState(DarkTheme); // Force Dark Mode as default
 
   return (
-    <SafeAreaProvider>
-      <NavigationContainer theme={theme}>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="MainApp" component={BottomTabs} />
-          <Stack.Screen name="Login" component={Login} />
-          <Stack.Screen name="Home" component={Home}/>
-          <Stack.Screen name="Signup" component={Signup} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </SafeAreaProvider>
+    <AuthProvider>
+      <SafeAreaProvider>
+        <NavigationContainer theme={theme}>
+
+          <RootNavigator/>
+
+        </NavigationContainer>
+      </SafeAreaProvider>
+    </AuthProvider>
   );
 }

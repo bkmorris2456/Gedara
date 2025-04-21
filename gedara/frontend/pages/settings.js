@@ -3,10 +3,22 @@ import { View, StyleSheet, ScrollView, TextInput } from 'react-native';
 import Template from '../pages/template';
 import { Provider as PaperProvider, Text, Surface, Button } from 'react-native-paper';
 import { theme } from '../theme';
+import { getAuth, signOut } from 'firebase/auth';
 
 export default function Settings({ navigation }) {
 
   const { colors } = theme;
+  const auth = getAuth();
+
+  const handleLogout = () => {
+    signOut(auth)
+      .then(() => {
+        console.log('User signed out');
+      })
+      .catch(error => {
+        console.error('Logout error:', error);
+      });
+  };
 
   return (
     <Template navigation={navigation}>
@@ -82,6 +94,14 @@ export default function Settings({ navigation }) {
           style={styles.save}
         >
           <Text>Navigate to Login</Text>
+        </Button>
+
+        <Button
+          mode="contained"
+          onPress={handleLogout}
+          style={styles.save}
+        >
+          <Text>Logout/Switch Account</Text>
         </Button>
 
       </ScrollView>

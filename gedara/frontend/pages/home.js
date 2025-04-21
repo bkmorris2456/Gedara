@@ -31,19 +31,19 @@ export default function Home({ navigation }) {
         <Text style={[styles.headers]}>Recently Added</Text>
 
         <ScrollView style={styles.recent} horizontal={false} showsVerticalScrollIndicator={false}>
-          <Card width={325} height={100} style={{ marginBottom: 10 }}>
+          <Card width={375} height={100} style={{ marginBottom: 10 }}>
             <Text style={styles.general_text}>Property</Text>
           </Card>
-          <Card width={325} height={100} style={{ marginBottom: 10 }}>
+          <Card width={375} height={100} style={{ marginBottom: 10 }}>
             <Text style={styles.general_text}>Property</Text>
           </Card>
-          <Card width={325} height={100} style={{ marginBottom: 10 }}>
+          <Card width={375} height={100} style={{ marginBottom: 10 }}>
             <Text style={styles.general_text}>Property</Text>
           </Card>
-          <Card width={325} height={100} style={{ marginBottom: 10 }}>
+          <Card width={375} height={100} style={{ marginBottom: 10 }}>
             <Text style={styles.general_text}>Property</Text>
           </Card>
-          <Card width={325} height={100} style={{ marginBottom: 10 }}>
+          <Card width={375} height={100} style={{ marginBottom: 10 }}>
             <Text style={styles.general_text}>Property</Text>
           </Card>
         </ScrollView>

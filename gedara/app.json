@@ -18,7 +18,8 @@
       "bundleIdentifier": "com.anonymous.gedara",
       "runtimeVersion": {
         "policy": "appVersion"
-      }
+      },
+      "jsEngine": "hermes"
     },
     "android": {
       "googleServicesFile": "./google-services.json",
@@ -27,10 +28,12 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.anonymous.gedara",
-      "runtimeVersion": "1.0.0"
+      "runtimeVersion": "1.0.0",
+      "jsEngine": "hermes"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
     },
     "plugins": [
       "expo-router",
