@@ -70,14 +70,14 @@ const HomeModal = ({ visible, onClose }) => {
           <Text style={styles.title}>Add Home</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter Home Name"
+            placeholder="Property Name"
             placeholderTextColor="#aaa"
             value={homeName}
             onChangeText={setHomeName}
           />
           <TextInput
             style={styles.input}
-            placeholder="Enter Number of Rooms"
+            placeholder="# of Rooms"
             placeholderTextColor="#aaa"
             value={roomTotal}
             onChangeText={setRoomTotal}
@@ -85,7 +85,7 @@ const HomeModal = ({ visible, onClose }) => {
           />
           <TextInput
             style={styles.input}
-            placeholder="Enter Estimated House Value"
+            placeholder="Estimated House Value"
             placeholderTextColor="#aaa"
             value={houseValue}
             onChangeText={setHouseValue}

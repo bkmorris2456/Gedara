@@ -17,9 +17,9 @@ const MenuButton = ({ onSelect }) => {
         onDismiss={closeMenu}
         anchor={<IconButton icon="plus" size={24} onPress={openMenu} iconColor={theme.colors.text} style={styles.menu} />}
       >
-        <Menu.Item onPress={() => { closeMenu(); onSelect('Home'); }} title="Home" />
-        <Menu.Item onPress={() => { closeMenu(); onSelect('Room'); }} title="Room" />
-        <Menu.Item onPress={() => { closeMenu(); onSelect('Item'); }} title="Item" />
+        <Menu.Item onPress={() => { closeMenu(); onSelect('Home'); }} title="Add Property" />
+        <Menu.Item onPress={() => { closeMenu(); onSelect('Room'); }} title="Add Room" />
+        <Menu.Item onPress={() => { closeMenu(); onSelect('Item'); }} title="Add Item" />
       </Menu>
     </View>
   );
