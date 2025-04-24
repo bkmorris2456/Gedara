@@ -1,6 +1,6 @@
 import { auth, db } from '../../config';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import React from 'react';
 import {
     View,
@@ -26,13 +26,12 @@ export default function Signup({ navigation }) {
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
+                const userRef = doc(db, 'users', user.uid);
                 console.log('User registered:');
 
-                await addDoc(collection(db, 'users'), {
-                    uid: user.uid,
+                await setDoc(userRef, {
                     name,
                     email,
-                    password,
                     createdAt: serverTimestamp(),
                 });
 
@@ -40,7 +39,6 @@ export default function Signup({ navigation }) {
                 onChangeEmail('');
                 onChangePassword('');
                 onChangeName('');
-                navigation.navigate('Login');
             } catch (error) {
                 alert("Signup failed: " + error.message);
             }

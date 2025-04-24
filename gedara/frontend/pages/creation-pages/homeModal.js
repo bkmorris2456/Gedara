@@ -5,11 +5,11 @@ import {
   TextInput, 
   Button, 
   Modal, 
-  StyleSheet } from 'react-native';
-import { Provider as PaperProvider, Surface } from 'react-native-paper';
+  StyleSheet 
+} from 'react-native';
 import { theme } from '../../theme';
 import { auth, db } from '../../../config';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, setDoc, doc, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const HomeModal = ({ visible, onClose }) => {
   const [homeName, setHomeName] = useState('');
@@ -18,24 +18,46 @@ const HomeModal = ({ visible, onClose }) => {
 
   const { colors } = theme;
 
-  // Function that will add home using Home Modal Form
+  // Function to add home using Home Modal Form
   const addHome = async () => {
+    const user = auth.currentUser;
+    if (!user) {
+      alert('No user signed in.');
+      return;
+    }
+
+    const userId = user.uid;
+    const propertiesRef = collection(db, 'users', userId, 'properties');
+
     try {
-      if (homeName && roomTotal && houseValue) {
-        await addDoc(collection(db, 'homes'), {
-          homeName,
-          roomTotal,
-          houseValue,
-          createdAt: serverTimestamp(),
-        });
-        alert('Home added!');
-        setHomeName('');
-        setRoomTotal('');
-        setHouseValue('');
-        onClose();
-      } else {
+      // Check if all fields are filled out
+      if (!homeName || !roomTotal || !houseValue) {
         alert('Please fill in all fields.');
+        return;
       }
+
+      // Validate roomTotal and houseValue to be numbers
+      const validHomeData = {
+        homeName: homeName.trim(),
+        roomTotal: parseInt(roomTotal, 10), // Convert roomTotal to an integer
+        houseValue: parseFloat(houseValue), // Convert houseValue to a float
+        createdAt: serverTimestamp(),
+      };
+
+      const propertyDocRef = doc(propertiesRef, homeName.trim());
+
+      // Add the home document
+      await setDoc(propertyDocRef, validHomeData);
+      alert('Home added successfully!');
+
+      // Clear the form fields
+      setHomeName('');
+      setRoomTotal('');
+      setHouseValue('');
+
+      // Close the modal after submission
+      onClose();
+
     } catch (error) {
       alert('Error adding home: ' + error.message);
     }
@@ -59,6 +81,7 @@ const HomeModal = ({ visible, onClose }) => {
             placeholderTextColor="#aaa"
             value={roomTotal}
             onChangeText={setRoomTotal}
+            keyboardType="numeric" // Ensures numeric input
           />
           <TextInput
             style={styles.input}
@@ -66,6 +89,7 @@ const HomeModal = ({ visible, onClose }) => {
             placeholderTextColor="#aaa"
             value={houseValue}
             onChangeText={setHouseValue}
+            keyboardType="numeric" // Ensures numeric input
           />
           <View style={styles.buttonStructure}>
             <Button title="Close" onPress={onClose} color="red" />
