@@ -1,13 +1,42 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import Template from '../pages/template';
 import Card from '../components/card';
 import { Provider as PaperProvider, Text, Surface } from 'react-native-paper';
 import { theme } from '../theme';
+import { auth, db } from '../../config';
+import { collection, getDocs, setDoc, addDoc, doc, serverTimestamp } from 'firebase/firestore';
 
 export default function Home({ navigation }) {
 
   const { colors } = theme;
+  const [homes, setHomes] = useState([]);
+
+  const fetchHomes = async () => {
+    const user = auth.currentUser;
+    if (user) {
+      try {
+        const userHomesRef = collection(db, 'users', user.uid, 'properties');
+        const querySnapshot = await getDocs(userHomesRef);
+        const homesList = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setHomes(homesList);
+      } catch (error) {
+        console.error('Error fetching homes: ', error);
+      }
+    }
+  };
+
+  // Fetch user homes and their data
+  useEffect(() => {
+    fetchHomes();
+  }, []);
+
+  const addHome = async(newHome) => {
+    setHomes((prevHomes) => [...prevHomes, newHome]);
+  };
 
   return (
     <Template navigation={navigation}>
@@ -17,15 +46,11 @@ export default function Home({ navigation }) {
         <Text style={[styles.headers]}>My Properties</Text>
 
         <ScrollView style={[styles.properties]} horizontal={true} showsHorizontalScrollIndicator={false}>
-          <Card width={180} height={125} style={{ marginRight: 10 }}>
-            <Text style={styles.general_text}>Property</Text>
-          </Card>
-          <Card width={180} height={125} style={{ marginRight: 10 }}>
-            <Text style={styles.general_text}>Property</Text>
-          </Card>
-          <Card width={180} height={125} style={{ marginRight: 10 }}>
-            <Text style={styles.general_text}>Property</Text>
-          </Card>
+          {homes.map((home) => (
+            <Card key={home.id} width={180} height={125} style={{ marginRight: 10 }}>
+              <Text style={styles.general_text}>{home.homeName}</Text>
+            </Card>
+          ))}
         </ScrollView>
 
         <Text style={[styles.headers]}>Recently Added</Text>

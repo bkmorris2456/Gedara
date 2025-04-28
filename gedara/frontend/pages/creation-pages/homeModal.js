@@ -36,6 +36,11 @@ const HomeModal = ({ visible, onClose }) => {
         return;
       }
 
+      if (homeName.includes('/')) {
+        alert('Home name cannot contain "/" character.');
+        return;
+      }
+
       // Validate roomTotal and houseValue to be numbers
       const validHomeData = {
         homeName: homeName.trim(),

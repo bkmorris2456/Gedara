@@ -39,6 +39,11 @@ const RoomModal = ({ visible, onClose }) => {
       return;
     }
 
+    if (roomName.includes('/')) {
+      Alert.alert('Room name cannot contain "/" character.');
+      return;
+    }
+
     try {
       const user = auth.currentUser;
       if (user) {
@@ -48,9 +53,9 @@ const RoomModal = ({ visible, onClose }) => {
           createdAt: serverTimestamp(),
         };
 
-        const roomRef = collection(db, 'users', user.uid, 'properties', selectedHome, 'rooms');
+        const roomDocRef = doc(db, 'users', user.uid, 'properties', selectedHome, 'rooms', roomName.trim());
 
-        await addDoc(roomRef, roomData);
+        await setDoc(roomDocRef, roomData);
         Alert.alert('Room added successfully!');
 
         setRoomName('');
