@@ -21,7 +21,7 @@ import ItemModal from './creation-pages/itemModal';
 const logo = require('../../assets/favicon.png');
 const Tab = createBottomTabNavigator();
 
-const Template = ({ children, navigation }) => {
+const Template = ({ children, navigation, onHomeAdded }) => {
   const { colors } = theme;
 
   const [selectedModal, setSelectedModal] = useState(null);
@@ -61,7 +61,11 @@ const Template = ({ children, navigation }) => {
         <View style={[styles.content, { backgroundColor: colors.primary }]}>
           {children}
           {/* Modals */}
-          <HomeModal visible={selectedModal === 'Home'} onClose={() => setSelectedModal(null)} />
+          <HomeModal 
+            visible={selectedModal === 'Home'} 
+            onClose={() => setSelectedModal(null)}
+            onHomeAdded={onHomeAdded}
+          />
           <RoomModal visible={selectedModal === 'Room'} onClose={() => setSelectedModal(null)} />
           <ItemModal visible={selectedModal === 'Item'} onClose={() => setSelectedModal(null)} />
         </View>

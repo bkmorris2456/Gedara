@@ -11,7 +11,7 @@ import { theme } from '../../theme';
 import { auth, db } from '../../../config';
 import { collection, setDoc, doc, addDoc, serverTimestamp } from 'firebase/firestore';
 
-const HomeModal = ({ visible, onClose }) => {
+const HomeModal = ({ visible, onClose, onHomeAdded }) => {
   const [homeName, setHomeName] = useState('');
   const [roomTotal, setRoomTotal] = useState('');
   const [houseValue, setHouseValue] = useState('');
@@ -54,6 +54,10 @@ const HomeModal = ({ visible, onClose }) => {
       // Add the home document
       await setDoc(propertyDocRef, validHomeData);
       alert('Home added successfully!');
+
+      if (onHomeAdded) {
+        onHomeAdded(); // Call the callback function to update the home list
+      }
 
       // Clear the form fields
       setHomeName('');

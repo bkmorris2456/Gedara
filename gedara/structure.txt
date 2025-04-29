@@ -1,3 +1,5 @@
+Current Data Structure
+
 users (collection)
   └── {uid} (document)
         ├── name: "John Doe"

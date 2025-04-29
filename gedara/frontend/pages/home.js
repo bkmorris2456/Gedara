@@ -5,12 +5,16 @@ import Card from '../components/card';
 import { Provider as PaperProvider, Text, Surface } from 'react-native-paper';
 import { theme } from '../theme';
 import { auth, db } from '../../config';
-import { collection, getDocs, setDoc, addDoc, doc, serverTimestamp } from 'firebase/firestore';
+import { 
+  collection, 
+  getDocs, 
+} from 'firebase/firestore';
 
 export default function Home({ navigation }) {
 
   const { colors } = theme;
   const [homes, setHomes] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const fetchHomes = async () => {
     const user = auth.currentUser;
@@ -34,12 +38,13 @@ export default function Home({ navigation }) {
     fetchHomes();
   }, []);
 
+  
   const addHome = async(newHome) => {
     setHomes((prevHomes) => [...prevHomes, newHome]);
   };
 
   return (
-    <Template navigation={navigation}>
+    <Template navigation={navigation} onHomeAdded={fetchHomes}>
 
       <View style={[styles.container, { backgroundColor: colors.primary }]}>
 
@@ -56,21 +61,7 @@ export default function Home({ navigation }) {
         <Text style={[styles.headers]}>Recently Added</Text>
 
         <ScrollView style={styles.recent} horizontal={false} showsVerticalScrollIndicator={false}>
-          <Card width={375} height={100} style={{ marginBottom: 10 }}>
-            <Text style={styles.general_text}>Property</Text>
-          </Card>
-          <Card width={375} height={100} style={{ marginBottom: 10 }}>
-            <Text style={styles.general_text}>Property</Text>
-          </Card>
-          <Card width={375} height={100} style={{ marginBottom: 10 }}>
-            <Text style={styles.general_text}>Property</Text>
-          </Card>
-          <Card width={375} height={100} style={{ marginBottom: 10 }}>
-            <Text style={styles.general_text}>Property</Text>
-          </Card>
-          <Card width={375} height={100} style={{ marginBottom: 10 }}>
-            <Text style={styles.general_text}>Property</Text>
-          </Card>
+
         </ScrollView>
 
         <Text style={[styles.headers]}>Inventory Value</Text>

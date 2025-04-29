@@ -82,6 +82,7 @@ const ItemModal = ({ visible, onClose }) => {
           itemQuant: parseInt(itemQuant),
           homeId: selectedHome,
           roomId: selectedRoom,
+          createdAt: serverTimestamp(),
         };
 
         const itemDocRef = doc(db, 'users', user.uid, 'properties', selectedHome, 'rooms', selectedRoom, 'items', itemName.trim());
