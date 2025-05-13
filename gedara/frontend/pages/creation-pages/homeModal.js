@@ -12,59 +12,54 @@ import { auth, db } from '../../../config';
 import { collection, setDoc, doc, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const HomeModal = ({ visible, onClose, onHomeAdded }) => {
-  const [homeName, setHomeName] = useState('');
+  const [propName, setPropName] = useState('');
   const [roomTotal, setRoomTotal] = useState('');
-  const [houseValue, setHouseValue] = useState('');
+  const [propValue, setPropValue] = useState('');
 
   const { colors } = theme;
 
-  // Function to add home using Home Modal Form
-  const addHome = async () => {
+  // Function to add property
+  const addProperty = async () => {
     const user = auth.currentUser;
     if (!user) {
       alert('No user signed in.');
       return;
     }
 
-    const userId = user.uid;
-    const propertiesRef = collection(db, 'users', userId, 'properties');
+    if (!propName || !roomTotal || !propValue) {
+      alert('Please fill in all fields.');
+      return;
+    }
+
+    if (propName.includes('/')) {
+      alert('Property name cannot contain "/" character.');
+      return;
+    }
 
     try {
-      // Check if all fields are filled out
-      if (!homeName || !roomTotal || !houseValue) {
-        alert('Please fill in all fields.');
-        return;
-      }
-
-      if (homeName.includes('/')) {
-        alert('Home name cannot contain "/" character.');
-        return;
-      }
-
-      // Validate roomTotal and houseValue to be numbers
-      const validHomeData = {
-        homeName: homeName.trim(),
-        roomTotal: parseInt(roomTotal, 10), // Convert roomTotal to an integer
-        houseValue: parseFloat(houseValue), // Convert houseValue to a float
+      const validPropData = {
+        propName: propName.trim(),
+        roomTotal: parseInt(roomTotal, 10),
+        propValue: parseFloat(propValue),
+        userId: user.uid,
         createdAt: serverTimestamp(),
       };
 
-      const propertyDocRef = doc(propertiesRef, homeName.trim());
+      const propertiesRef = collection(db, 'properties');
 
-      // Add the home document
-      await setDoc(propertyDocRef, validHomeData);
-      alert('Home added successfully!');
+      // Auto-generate a unique ID and add document
+      await addDoc(propertiesRef, validPropData);
+
+      alert('Property added successfully!');
 
       if (onHomeAdded) {
-        onHomeAdded(); // Call the callback function to update the home list
+        onHomeAdded(); // Refresh the home list
       }
 
-      // Clear the form fields
-      setHomeName('');
+      // Clear form fields
+      setPropName('');
       setRoomTotal('');
-      setHouseValue('');
-
-      // Close the modal after submission
+      setPropValue('');
       onClose();
 
     } catch (error) {
@@ -81,8 +76,8 @@ const HomeModal = ({ visible, onClose, onHomeAdded }) => {
             style={styles.input}
             placeholder="Property Name"
             placeholderTextColor="#aaa"
-            value={homeName}
-            onChangeText={setHomeName}
+            value={propName}
+            onChangeText={setPropName}
           />
           <TextInput
             style={styles.input}
@@ -94,15 +89,15 @@ const HomeModal = ({ visible, onClose, onHomeAdded }) => {
           />
           <TextInput
             style={styles.input}
-            placeholder="Estimated House Value"
+            placeholder="Estimated Property Value"
             placeholderTextColor="#aaa"
-            value={houseValue}
-            onChangeText={setHouseValue}
+            value={propValue}
+            onChangeText={setPropValue}
             keyboardType="numeric" // Ensures numeric input
           />
           <View style={styles.buttonStructure}>
             <Button title="Close" onPress={onClose} color="red" />
-            <Button title="Submit" onPress={addHome} />
+            <Button title="Submit" onPress={addProperty} />
           </View>
         </View>
       </View>

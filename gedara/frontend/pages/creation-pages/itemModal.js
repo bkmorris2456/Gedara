@@ -8,6 +8,7 @@ import { Picker } from '@react-native-picker/picker';
 const ItemModal = ({ visible, onClose }) => {
   const [itemName, setItemName] = useState('');
   const [itemQuant, setItemQuant] = useState('');
+  const [estValue, setEstValue] = useState('');
   const [homes, setHomes] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [selectedHome, setSelectedHome] = useState('');
@@ -64,7 +65,7 @@ const ItemModal = ({ visible, onClose }) => {
   }, [selectedHome]);
 
   const addItem = async () => {
-    if (!itemName || !itemQuant || !selectedHome || !selectedRoom) {
+    if (!itemName || !itemQuant || !selectedHome || !selectedRoom || !estValue) {
       alert('Please fill in all fields.');
       return;
     }
@@ -80,6 +81,7 @@ const ItemModal = ({ visible, onClose }) => {
         const itemData = {
           itemName: itemName.trim(),
           itemQuant: parseInt(itemQuant),
+          estValue: parseFloat(estValue),
           homeId: selectedHome,
           roomId: selectedRoom,
           createdAt: serverTimestamp(),
@@ -146,6 +148,13 @@ const ItemModal = ({ visible, onClose }) => {
             placeholderTextColor="#aaa"
             value={itemQuant}
             onChangeText={setItemQuant}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Enter Est. Value"
+            placeholderTextColor="#aaa"
+            value={estValue}
+            onChangeText={setEstValue}
           />
           <View style={styles.buttonStructure}>
             <Button title="Close" onPress={onClose} color="red" />
