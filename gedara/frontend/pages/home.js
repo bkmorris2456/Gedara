@@ -7,26 +7,29 @@ import { theme } from '../theme';
 import { auth, db } from '../../config';
 import { 
   collection, 
-  getDocs, 
+  getDocs,
+  query,
+  where
 } from 'firebase/firestore';
 
 export default function Home({ navigation }) {
 
   const { colors } = theme;
-  const [homes, setHomes] = useState([]);
+  const [props, setProps] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
 
-  const fetchHomes = async () => {
+  const fetchProps = async () => {
     const user = auth.currentUser;
     if (user) {
       try {
-        const userHomesRef = collection(db, 'users', user.uid, 'properties');
-        const querySnapshot = await getDocs(userHomesRef);
-        const homesList = querySnapshot.docs.map(doc => ({
+        const userPropsRef = collection(db, 'properties');
+        const q = query(userPropsRef, where('userId', '==', user.uid));
+        const querySnapshot = await getDocs(q);
+        const propsList = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data(),
         }));
-        setHomes(homesList);
+        setProps(propsList);
       } catch (error) {
         console.error('Error fetching homes: ', error);
       }
@@ -35,25 +38,25 @@ export default function Home({ navigation }) {
 
   // Fetch user homes and their data
   useEffect(() => {
-    fetchHomes();
+    fetchProps();
   }, []);
 
   
-  const addHome = async(newHome) => {
-    setHomes((prevHomes) => [...prevHomes, newHome]);
-  };
+  // const addProps = async(newHome) => {
+  //   setProps((prevHomes) => [...prevHomes, newHome]);
+  // };
 
   return (
-    <Template navigation={navigation} onHomeAdded={fetchHomes}>
+    <Template navigation={navigation} onHomeAdded={fetchProps}>
 
       <View style={[styles.container, { backgroundColor: colors.primary }]}>
 
         <Text style={[styles.headers]}>My Properties</Text>
 
         <ScrollView style={[styles.properties]} horizontal={true} showsHorizontalScrollIndicator={false}>
-          {homes.map((home) => (
-            <Card key={home.id} width={180} height={125} style={{ marginRight: 10 }}>
-              <Text style={styles.general_text}>{home.homeName}</Text>
+          {props.map((prop) => (
+            <Card key={prop.id} width={180} height={125} style={{ marginRight: 10 }}>
+              <Text style={styles.general_text}>{prop.propName}</Text>
             </Card>
           ))}
         </ScrollView>

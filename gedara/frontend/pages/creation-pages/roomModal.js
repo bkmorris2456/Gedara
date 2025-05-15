@@ -2,40 +2,43 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, Button, Modal, StyleSheet, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { auth, db } from '../../../config';
-import { collection, getDocs, setDoc, addDoc, doc, serverTimestamp } from 'firebase/firestore';
+import { collection, getDocs, addDoc, doc, serverTimestamp, setDoc, runTransaction } from 'firebase/firestore';
 
 const RoomModal = ({ visible, onClose }) => {
   const [roomName, setRoomName] = useState('');
-  const [selectedHome, setSelectedHome] = useState('');
-  const [homes, setHomes] = useState([]);
+  const [selectedProp, setSelectedProp] = useState('');
+  const [props, setProps] = useState([]);
 
   // Fetch homes when modal is opened
   useEffect(() => {
-    const fetchHomes = async () => {
+    const fetchProps = async () => {
       const user = auth.currentUser;
       if (user) {
         try {
-          const userHomesRef = collection(db, 'users', user.uid, 'properties');
-          const querySnapshot = await getDocs(userHomesRef);
-          const homesList = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-          setHomes(homesList);
+          const allPropsRef = collection(db, 'properties');
+          const querySnapshot = await getDocs(allPropsRef);
+          const userProps = querySnapshot.docs
+            .filter(doc => doc.data().userId === user.uid)
+            .map(doc => ({
+              id: doc.id,
+              ...doc.data(),
+            }));
+          setProps(userProps);
         } catch (error) {
-          console.error('Error fetching homes: ', error);
+          console.error('Error fetching properties: ', error);
         }
       }
     };
 
     if (visible) {
-      fetchHomes();
+      fetchProps();
     }
   }, [visible]);
 
-  const addRoom = async() => {
-    if (!roomName || !selectedHome) {
-      alert('Please fill in all fields.');
+  // Function to add room to user's selected property
+  const addRoom = async () => {
+    if (!roomName || !selectedProp) {
+      Alert.alert('Please fill in all fields.');
       return;
     }
 
@@ -46,30 +49,42 @@ const RoomModal = ({ visible, onClose }) => {
 
     try {
       const user = auth.currentUser;
-      if (user) {
-        const roomData = {
+      if (!user) return;
+
+      const roomRef = doc(collection(db, 'rooms')); // Generate doc ref
+      const propertyRef = doc(db, 'properties', selectedProp);
+
+      await runTransaction(db, async (transaction) => {
+        const propDoc = await transaction.get(propertyRef);
+        if (!propDoc.exists()) {
+          throw new Error('Property does not exist');
+        }
+
+        const currentTotal = propDoc.data().roomTotal || 0;
+
+        transaction.set(roomRef, {
           roomName: roomName.trim(),
-          homeId: selectedHome,
+          homeId: selectedProp,
+          estVal: 0,
           createdAt: serverTimestamp(),
-        };
+        });
 
-        const roomDocRef = doc(db, 'users', user.uid, 'properties', selectedHome, 'rooms', roomName.trim());
+        transaction.update(propertyRef, {
+          roomTotal: currentTotal + 1,
+        });
+      });
 
-        await setDoc(roomDocRef, roomData);
-        Alert.alert('Room added successfully!');
-
-        setRoomName('');
-        setSelectedHome('');
-        onClose();
-      }
+      Alert.alert('Room added successfully!');
+      setRoomName('');
+      setSelectedProp('');
+      onClose();
 
     } catch (error) {
       console.error('Error adding room: ', error);
       Alert.alert('Error adding room: ' + error.message);
     }
-
   };
-  
+
   return (
     <Modal visible={visible} animationType="fade" transparent>
       <View style={styles.modalContainer}>
@@ -77,15 +92,15 @@ const RoomModal = ({ visible, onClose }) => {
           <Text style={styles.title}>Add Room</Text>
 
           {/* Homes Picker */}
-          {homes.length > 0 && (
+          {props.length > 0 && (
             <Picker
-              selectedValue={selectedHome}
-              onValueChange={(itemValue) => setSelectedHome(itemValue)}
+              selectedValue={selectedProp}
+              onValueChange={(itemValue) => setSelectedProp(itemValue)}
               style={{ width: '100%', height: 'auto' }}
             >
-              <Picker.Item label="Select Home" value="" />
-              {homes.map((home) => (
-                <Picker.Item key={home.id} label={home.homeName} value={home.id} />
+              <Picker.Item label="Select Property" value="" />
+              {props.map((prop) => (
+                <Picker.Item key={prop.id} label={prop.propName} value={prop.id} />
               ))}
             </Picker>
           )}

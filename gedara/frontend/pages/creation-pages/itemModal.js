@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, Modal, StyleSheet, Alert } from 'react-native';
 import { theme } from '../../theme';
 import { auth, db } from '../../../config';
-import { collection, getDocs, setDoc, addDoc, doc, serverTimestamp } from 'firebase/firestore';
+import { collection, getDocs, addDoc, query, where, serverTimestamp } from 'firebase/firestore';
 import { Picker } from '@react-native-picker/picker';
 
 const ItemModal = ({ visible, onClose }) => {
@@ -16,47 +16,40 @@ const ItemModal = ({ visible, onClose }) => {
   
   const { colors } = theme;
 
-  // Fetch homes when modal is opened
+  // Fetch homes
   useEffect(() => {
     const fetchHomes = async () => {
-      const user = auth.currentUser;
-      if (user) {
-        try {
-          const userHomesRef = collection(db, 'users', user.uid, 'properties');
-          const querySnapshot = await getDocs(userHomesRef);
-          const homesList = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-          setHomes(homesList);
-        } catch (error) {
-          console.error('Error fetching homes: ', error);
-        }
+      try {
+        const homesRef = collection(db, 'properties');
+        const querySnapshot = await getDocs(homesRef);
+        const homesList = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setHomes(homesList);
+      } catch (error) {
+        console.error('Error fetching homes: ', error);
       }
     };
 
-    if (visible) {
-      fetchHomes();
-    }
+    if (visible) fetchHomes();
   }, [visible]);
 
-  // Fetch rooms for the selected home
+  // Fetch rooms for selected home
   useEffect(() => {
     const fetchRooms = async () => {
       if (selectedHome) {
-        const user = auth.currentUser;
-        if (user) {
-          try {
-            const roomsRef = collection(db, 'users', user.uid, 'properties', selectedHome, 'rooms');
-            const querySnapshot = await getDocs(roomsRef);
-            const roomsList = querySnapshot.docs.map(doc => ({
-              id: doc.id,
-              ...doc.data(),
-            }));
-            setRooms(roomsList);
-          } catch (error) {
-            console.error('Error fetching rooms: ', error);
-          }
+        try {
+          const roomsRef = collection(db, 'rooms');
+          const roomQuery = query(roomsRef, where('homeId', '==', selectedHome));
+          const querySnapshot = await getDocs(roomQuery);
+          const roomsList = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setRooms(roomsList);
+        } catch (error) {
+          console.error('Error fetching rooms: ', error);
         }
       }
     };
@@ -65,8 +58,8 @@ const ItemModal = ({ visible, onClose }) => {
   }, [selectedHome]);
 
   const addItem = async () => {
-    if (!itemName || !itemQuant || !selectedHome || !selectedRoom || !estValue) {
-      alert('Please fill in all fields.');
+    if (!itemName || !itemQuant || !estValue || !selectedHome || !selectedRoom) {
+      Alert.alert('Please fill in all fields.');
       return;
     }
 
@@ -80,19 +73,20 @@ const ItemModal = ({ visible, onClose }) => {
       if (user) {
         const itemData = {
           itemName: itemName.trim(),
-          itemQuant: parseInt(itemQuant),
-          estValue: parseFloat(estValue),
-          homeId: selectedHome,
+          quantity: parseInt(itemQuant),
+          estVal: parseFloat(estValue),
           roomId: selectedRoom,
           createdAt: serverTimestamp(),
         };
 
-        const itemDocRef = doc(db, 'users', user.uid, 'properties', selectedHome, 'rooms', selectedRoom, 'items', itemName.trim());
-        await setDoc(itemDocRef, itemData);
+        const itemsRef = collection(db, 'items');
+        await addDoc(itemsRef, itemData);
 
         Alert.alert('Item added successfully!');
         setItemName('');
         setItemQuant('');
+        setEstValue('');
+        setSelectedRoom('');
         onClose();
       }
     } catch (error) {
@@ -108,18 +102,16 @@ const ItemModal = ({ visible, onClose }) => {
           <Text style={styles.title}>Add Item</Text>
 
           {/* Home Picker */}
-          {homes.length > 0 && (
-            <Picker
-              selectedValue={selectedHome}
-              onValueChange={(itemValue) => setSelectedHome(itemValue)}
-              style={{ width: '100%', height: 50 }}
-            >
-              <Picker.Item label="Select Home" value="" />
-              {homes.map((home) => (
-                <Picker.Item key={home.id} label={home.homeName || "Unnamed Home"} value={home.id} />
-              ))}
-            </Picker>
-          )}
+          <Picker
+            selectedValue={selectedHome}
+            onValueChange={(itemValue) => setSelectedHome(itemValue)}
+            style={{ width: '100%', height: 50 }}
+          >
+            <Picker.Item label="Select Home" value="" />
+            {homes.map((home) => (
+              <Picker.Item key={home.id} label={home.propName || "Unnamed Home"} value={home.id} />
+            ))}
+          </Picker>
 
           {/* Room Picker */}
           {rooms.length > 0 && selectedHome && (
@@ -144,10 +136,11 @@ const ItemModal = ({ visible, onClose }) => {
           />
           <TextInput
             style={styles.input}
-            placeholder="Enter Item Quantity"
+            placeholder="Enter Quantity"
             placeholderTextColor="#aaa"
             value={itemQuant}
             onChangeText={setItemQuant}
+            keyboardType="numeric"
           />
           <TextInput
             style={styles.input}
@@ -155,6 +148,7 @@ const ItemModal = ({ visible, onClose }) => {
             placeholderTextColor="#aaa"
             value={estValue}
             onChangeText={setEstValue}
+            keyboardType="numeric"
           />
           <View style={styles.buttonStructure}>
             <Button title="Close" onPress={onClose} color="red" />

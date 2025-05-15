@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { theme } from '../../theme';
 import { auth, db } from '../../../config';
-import { collection, setDoc, doc, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const HomeModal = ({ visible, onClose, onHomeAdded }) => {
   const [propName, setPropName] = useState('');
