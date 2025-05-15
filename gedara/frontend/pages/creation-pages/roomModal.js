@@ -65,6 +65,7 @@ const RoomModal = ({ visible, onClose }) => {
         transaction.set(roomRef, {
           roomName: roomName.trim(),
           homeId: selectedProp,
+          userId: user.uid,
           estVal: 0,
           createdAt: serverTimestamp(),
         });

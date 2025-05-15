@@ -82,22 +82,6 @@ export default function Settings({ navigation }) {
 
         <Button
           mode="contained"
-          onPress={() => navigation.navigate('Signup')}
-          style={styles.save}
-        >
-          <Text>Navigate to Signup</Text>
-        </Button>
-
-        <Button
-          mode="contained"
-          onPress={() => navigation.navigate('Login')}
-          style={styles.save}
-        >
-          <Text>Navigate to Login</Text>
-        </Button>
-
-        <Button
-          mode="contained"
           onPress={handleLogout}
           style={styles.save}
         >

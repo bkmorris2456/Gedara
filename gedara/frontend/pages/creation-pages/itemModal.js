@@ -76,6 +76,7 @@ const ItemModal = ({ visible, onClose }) => {
           quantity: parseInt(itemQuant),
           estVal: parseFloat(estValue),
           roomId: selectedRoom,
+          userId: user.uid,
           createdAt: serverTimestamp(),
         };
 

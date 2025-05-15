@@ -16,8 +16,6 @@ const HomeModal = ({ visible, onClose, onHomeAdded }) => {
   const [roomTotal, setRoomTotal] = useState('');
   const [propValue, setPropValue] = useState('');
 
-  const { colors } = theme;
-
   // Function to add property
   const addProperty = async () => {
     const user = auth.currentUser;

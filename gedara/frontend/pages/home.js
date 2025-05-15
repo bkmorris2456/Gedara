@@ -1,54 +1,131 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, FlatList } from 'react-native';
 import Template from '../pages/template';
 import Card from '../components/card';
-import { Provider as PaperProvider, Text, Surface } from 'react-native-paper';
+import { Provider as PaperProvider, Text } from 'react-native-paper';
 import { theme } from '../theme';
 import { auth, db } from '../../config';
-import { 
-  collection, 
-  getDocs,
+import {
+  collection,
   query,
-  where
+  where,
+  onSnapshot
 } from 'firebase/firestore';
 
 export default function Home({ navigation }) {
-
   const { colors } = theme;
   const [props, setProps] = useState([]);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [homes, setHomes] = useState([]);
+  const [rooms, setRooms] = useState([]);
+  const [items, setItems] = useState([]);
+  const [recentEntries, setRecentEntries] = useState([]);
 
-  const fetchProps = async () => {
-    const user = auth.currentUser;
-    if (user) {
-      try {
-        const userPropsRef = collection(db, 'properties');
-        const q = query(userPropsRef, where('userId', '==', user.uid));
-        const querySnapshot = await getDocs(q);
-        const propsList = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setProps(propsList);
-      } catch (error) {
-        console.error('Error fetching homes: ', error);
-      }
-    }
-  };
-
-  // Fetch user homes and their data
+  // Real-time listeners for homes, rooms, and items
   useEffect(() => {
-    fetchProps();
+    const userId = auth.currentUser?.uid;
+    if (!userId) return;
+
+    const homesQuery = query(
+      collection(db, 'properties'),
+      where('userId', '==', userId)
+    );
+    const roomsQuery = query(
+      collection(db, 'rooms'),
+      where('userId', '==', userId)
+    );
+    const itemsQuery = query(
+      collection(db, 'items'),
+      where('userId', '==', userId)
+    );
+
+    const unsubHomes = onSnapshot(homesQuery, (snapshot) => {
+      const data = snapshot.docs.map(doc => ({
+        ...doc.data(),
+        id: doc.id,
+        type: 'Home',
+      }));
+      setHomes(data);
+    });
+
+    const unsubRooms = onSnapshot(roomsQuery, (snapshot) => {
+      const data = snapshot.docs.map(doc => ({
+        ...doc.data(),
+        id: doc.id,
+        type: 'Room',
+      }));
+      setRooms(data);
+    });
+
+    const unsubItems = onSnapshot(itemsQuery, (snapshot) => {
+      const data = snapshot.docs.map(doc => ({
+        ...doc.data(),
+        id: doc.id,
+        type: 'Item',
+      }));
+      setItems(data);
+    });
+
+    // Cleanup listeners
+    return () => {
+      unsubHomes();
+      unsubRooms();
+      unsubItems();
+    };
   }, []);
 
-  
-  // const addProps = async(newHome) => {
-  //   setProps((prevHomes) => [...prevHomes, newHome]);
-  // };
+  // Merge and sort all entries
+  useEffect(() => {
+    const all = [...homes, ...rooms, ...items];
+    const sorted = all
+      .filter(entry => entry.createdAt)
+      .sort((a, b) => b.createdAt?.seconds - a.createdAt?.seconds)
+      .slice(0, 5);
+    setRecentEntries(sorted);
+  }, [homes, rooms, items]);
+
+  const renderItem = ({ item }) => {
+    let displayName = '';
+
+    if (item.type === 'Home') {
+      displayName = item.propName || 'Unnamed Property';
+    } else if (item.type === 'Room') {
+      displayName = item.roomName || 'Unnamed Room';
+    } else if (item.type === 'Item') {
+      displayName = item.itemName || 'Unnamed Item';
+    }
+
+    return (
+      <Card width="80%" height={80} style={{ marginBottom: 10 }}>
+        <View>
+          <Text style={styles.entryType}>{item.type}</Text>
+          <Text style={styles.entryName}>{displayName}</Text>
+        </View>
+      </Card>
+    );
+  };
+
+  useEffect(() => {
+    const userId = auth.currentUser?.uid;
+    if (!userId) return;
+
+    const userPropsRef = query(
+      collection(db, 'properties'),
+      where('userId', '==', userId)
+    );
+
+    const unsubProps = onSnapshot(userPropsRef, (snapshot) => {
+      const propsList = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setProps(propsList);
+    });
+
+    return () => unsubProps();
+  }, []);
 
   return (
-    <Template navigation={navigation} onHomeAdded={fetchProps}>
-
+    <Template navigation={navigation}>
       <View style={[styles.container, { backgroundColor: colors.primary }]}>
 
         <Text style={[styles.headers]}>My Properties</Text>
@@ -63,9 +140,14 @@ export default function Home({ navigation }) {
 
         <Text style={[styles.headers]}>Recently Added</Text>
 
-        <ScrollView style={styles.recent} horizontal={false} showsVerticalScrollIndicator={false}>
-
-        </ScrollView>
+        <View style={styles.recent}>
+          <FlatList
+            data={recentEntries}
+            keyExtractor={(item) => item.id}
+            renderItem={renderItem}
+            ListEmptyComponent={<Text style={{ color: '#fff' }}>No recent entries</Text>}
+          />
+        </View>
 
         <Text style={[styles.headers]}>Inventory Value</Text>
 
@@ -82,7 +164,6 @@ export default function Home({ navigation }) {
         </View>
 
       </View>
-
     </Template>
   );
 }
@@ -92,24 +173,22 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 5,
   },
-  headers: { 
+  headers: {
     color: '#fff',
-    display: 'flex',
-    flexDirection: 'column',
     fontSize: 20,
     fontWeight: 'bold',
     marginVertical: 15,
-   }, // Default text color
+  },
   properties: {
     marginTop: 5,
     flexGrow: 1,
-    maxHeight: 125, // Limit height for the properties section
+    maxHeight: 125,
   },
   recent: {
     marginVertical: 5,
     flexGrow: 1,
-    maxHeight: 325, // Limit height for the recent properties section
-    overflow: 'hidden', // Hide overflow to prevent scrollbars
+    maxHeight: 325,
+    overflow: 'hidden',
   },
   summaries: {
     flexDirection: 'row',
@@ -122,6 +201,20 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#fff',
     fontSize: 15,
-  }
-
+  },
+  entryCard: {
+    backgroundColor: '#f1f1f1',
+    padding: 10,
+    marginVertical: 6,
+    borderRadius: 8,
+  },
+  entryType: {
+    fontSize: 14,
+    color: '#888',
+  },
+  entryName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+  },
 });
