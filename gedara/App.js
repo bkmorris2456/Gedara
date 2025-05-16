@@ -10,8 +10,7 @@ import auth, { FirebaseAuthtypes } from '@react-native-firebase/auth';
 import Home from './frontend/pages/home';
 import Inventory from './frontend/pages/inventory';
 import Settings from './frontend/pages/settings';
-import Login from './frontend/pages/login';
-import Signup from './frontend/pages/signup';
+
 // Import modals
 import HomeModal from './frontend/pages/creation-pages/homeModal';
 import RoomModal from './frontend/pages/creation-pages/roomModal';

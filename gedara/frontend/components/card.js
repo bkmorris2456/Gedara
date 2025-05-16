@@ -1,10 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
-const Card = ({ width, height, children, style, variant = 'dark' }) => {
+const Card = ({ width, height, children, style, variant = 'dark', onPress }) => {
   const isChildCard = variant === 'light';
 
-  return (
+  const CardContent = (
     <View style={[
       styles.card, 
       { 
@@ -15,10 +15,19 @@ const Card = ({ width, height, children, style, variant = 'dark' }) => {
       }, 
       style
     ]}>
-      {/* Ensures all direct text inside Card is white */}
       {children}
     </View>
   );
+
+  if (onPress) {
+    return (
+      <TouchableOpacity activeOpacity={0.7} onPress={onPress}>
+        {CardContent}
+      </TouchableOpacity>
+    );
+  }
+
+  return CardContent;
 };
 
 const styles = StyleSheet.create({
@@ -30,9 +39,9 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
     display: 'flex',
-    flexDirection: 'space-between',
+    // flexDirection: 'space-between' is invalid, use 'row' or 'column' instead if needed
   },
-  text: { color: '#fff' }, // Default text color inside Card
+  text: { color: '#fff' },
 });
 
 export default Card;
