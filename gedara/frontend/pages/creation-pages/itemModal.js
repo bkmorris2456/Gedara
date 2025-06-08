@@ -13,15 +13,21 @@ const ItemModal = ({ visible, onClose }) => {
   const [rooms, setRooms] = useState([]);
   const [selectedHome, setSelectedHome] = useState('');
   const [selectedRoom, setSelectedRoom] = useState('');
-  
+
   const { colors } = theme;
 
-  // Fetch homes
+  // Fetch homes for the current user
   useEffect(() => {
     const fetchHomes = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+
       try {
-        const homesRef = collection(db, 'properties');
-        const querySnapshot = await getDocs(homesRef);
+        const homesQuery = query(
+          collection(db, 'properties'),
+          where('userId', '==', user.uid)
+        );
+        const querySnapshot = await getDocs(homesQuery);
         const homesList = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data(),
@@ -32,25 +38,35 @@ const ItemModal = ({ visible, onClose }) => {
       }
     };
 
-    if (visible) fetchHomes();
+    if (visible) {
+      fetchHomes();
+      setSelectedHome('');
+      setSelectedRoom('');
+      setRooms([]);
+    }
   }, [visible]);
 
-  // Fetch rooms for selected home
+  // Fetch rooms when home is selected
   useEffect(() => {
     const fetchRooms = async () => {
-      if (selectedHome) {
-        try {
-          const roomsRef = collection(db, 'rooms');
-          const roomQuery = query(roomsRef, where('homeId', '==', selectedHome));
-          const querySnapshot = await getDocs(roomQuery);
-          const roomsList = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-          setRooms(roomsList);
-        } catch (error) {
-          console.error('Error fetching rooms: ', error);
-        }
+      const user = auth.currentUser;
+      if (!user || !selectedHome) return;
+
+      try {
+        const roomsQuery = query(
+          collection(db, 'rooms'),
+          where('homeId', '==', selectedHome),
+          where('userId', '==', user.uid)
+        );
+        const querySnapshot = await getDocs(roomsQuery);
+        const roomsList = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setRooms(roomsList);
+        setSelectedRoom(''); // Reset previously selected room
+      } catch (error) {
+        console.error('Error fetching rooms: ', error);
       }
     };
 
@@ -88,6 +104,7 @@ const ItemModal = ({ visible, onClose }) => {
         setItemQuant('');
         setEstValue('');
         setSelectedRoom('');
+        setSelectedHome('');
         onClose();
       }
     } catch (error) {
@@ -102,32 +119,32 @@ const ItemModal = ({ visible, onClose }) => {
         <View style={styles.modalContent}>
           <Text style={styles.title}>Add Item</Text>
 
-          {/* Home Picker */}
+          {/* Property Picker */}
           <Picker
             selectedValue={selectedHome}
             onValueChange={(itemValue) => setSelectedHome(itemValue)}
             style={{ width: '100%', height: 50 }}
           >
-            <Picker.Item label="Select Home" value="" />
+            <Picker.Item label="Select Property" value="" />
             {homes.map((home) => (
               <Picker.Item key={home.id} label={home.propName || "Unnamed Home"} value={home.id} />
             ))}
           </Picker>
 
           {/* Room Picker */}
-          {rooms.length > 0 && selectedHome && (
-            <Picker
-              selectedValue={selectedRoom}
-              onValueChange={(itemValue) => setSelectedRoom(itemValue)}
-              style={{ width: '100%', height: 50, marginTop: 10 }}
-            >
-              <Picker.Item label="Select Room" value="" />
-              {rooms.map((room) => (
-                <Picker.Item key={room.id} label={room.roomName} value={room.id} />
-              ))}
-            </Picker>
-          )}
+          <Picker
+            selectedValue={selectedRoom}
+            onValueChange={(itemValue) => setSelectedRoom(itemValue)}
+            style={{ width: '100%', height: 50, marginTop: 10 }}
+            enabled={rooms.length > 0}
+          >
+            <Picker.Item label={rooms.length > 0 ? "Select Room" : "No Rooms Found"} value="" />
+            {rooms.map((room) => (
+              <Picker.Item key={room.id} label={room.roomName} value={room.id} />
+            ))}
+          </Picker>
 
+          {/* Inputs */}
           <TextInput
             style={styles.input}
             placeholder="Enter Item Name"

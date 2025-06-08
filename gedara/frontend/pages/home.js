@@ -132,7 +132,17 @@ export default function Home({ navigation }) {
 
         <ScrollView style={[styles.properties]} horizontal={true} showsHorizontalScrollIndicator={false}>
           {props.map((prop) => (
-            <Card key={prop.id} width={180} height={125} style={{ marginRight: 10 }}>
+            <Card
+              key={prop.id}
+              width={180}
+              height={125}
+              style={{ marginRight: 10 }}
+              onPress={() => navigation.navigate('DetailScreen', {
+                parentId: prop.id,
+                parentType: 'property',
+                title: prop.propName,
+              })}
+            >
               <Text style={styles.general_text}>{prop.propName}</Text>
             </Card>
           ))}

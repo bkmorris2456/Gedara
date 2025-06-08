@@ -21,7 +21,7 @@ export default function DetailScreen({ navigation }) {
 
     if (parentType === 'property') {
       coll = 'rooms';
-      field = 'propertyId';
+      field = 'homeId';
     } else if (parentType === 'room') {
       coll = 'items';
       field = 'roomId';
