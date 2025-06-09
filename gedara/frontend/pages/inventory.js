@@ -47,7 +47,6 @@ export default function Inventory({ navigation }) {
                 title: property.propName,
               })}
               onEdit={() => console.log(`Edit Property ${property.id}`)}
-              onDelete={() => console.log(`Delete Property ${property.id}`)}
             />
           ))}
         </ScrollView>
