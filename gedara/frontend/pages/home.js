@@ -12,15 +12,21 @@ import {
   onSnapshot
 } from 'firebase/firestore';
 
+// Main Home Screen
 export default function Home({ navigation, triggerDelete }) {
   const { colors } = theme;
-  const [props, setProps] = useState([]);
+
+  // States for managing data
+  const [props, setProps] = useState([]); // Raw list of user's properties (for My Properties section)
+
+  // All user elements (properties, rooms, and items)
   const [properties, setProperties] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [items, setItems] = useState([]);
-  const [recentEntries, setRecentEntries] = useState([]);
 
-  // Real-time listeners for properties, rooms, and items
+  const [recentEntries, setRecentEntries] = useState([]); // Merged and sorted list of recent additions made by user
+
+  // Fetch all elements created by the user
   useEffect(() => {
     const userId = auth.currentUser?.uid;
     if (!userId) return;
@@ -38,6 +44,7 @@ export default function Home({ navigation, triggerDelete }) {
       where('userId', '==', userId)
     );
 
+    // Real-time listeners for properties, rooms, and items
     const unsubProperties = onSnapshot(propertiesQuery, (snapshot) => {
       const data = snapshot.docs.map(doc => ({
         ...doc.data(),
@@ -65,7 +72,7 @@ export default function Home({ navigation, triggerDelete }) {
       setItems(data);
     });
 
-    // Cleanup listeners
+    // Clean up the listeners on component unmount
     return () => {
       unsubProperties();
       unsubRooms();
@@ -73,20 +80,22 @@ export default function Home({ navigation, triggerDelete }) {
     };
   }, []);
 
-  // Merge and sort all entries
+  // Merge and sort all entries by creation time for recent activity section
   useEffect(() => {
     const all = [...properties, ...rooms, ...items];
     const sorted = all
-      .filter(entry => entry.createdAt)
-      .sort((a, b) => b.createdAt?.seconds - a.createdAt?.seconds)
-      .slice(0, 5);
+      .filter(entry => entry.createdAt) // Only entries with timestamps
+      .sort((a, b) => b.createdAt?.seconds - a.createdAt?.seconds) // Sorted by descending order
+      .slice(0, 5); // Show only the 5 most recent
     setRecentEntries(sorted);
   }, [properties, rooms, items]);
 
+  // Used in FlatList to render each item
   const renderItem = ({ item }) => {
     let displayName = '';
     let type = item.type;
 
+    // Resolve a display name based on the type of element
     if (type === 'Property') {
       displayName = item.propName || 'Unnamed Property';
     } else if (type === 'Room') {
@@ -101,7 +110,7 @@ export default function Home({ navigation, triggerDelete }) {
         height={100}
         title={displayName}
         type={type}
-        // Optional: Add navigation for each item type if desired
+        // Navigate to DetailScreen template to load up children elements depending on type of card pressed
         onPress={() => {
           if (type === 'Property') {
             navigation.navigate('DetailScreen', {
@@ -123,6 +132,7 @@ export default function Home({ navigation, triggerDelete }) {
     );
   };
 
+  // Fetch raw property list for horizontal scroll section
   useEffect(() => {
     const userId = auth.currentUser?.uid;
     if (!userId) return;
@@ -143,12 +153,13 @@ export default function Home({ navigation, triggerDelete }) {
     return () => unsubProps();
   }, []);
 
+  // Render Home screen
   return (
     <Template navigation={navigation}>
       <View style={[styles.container, { backgroundColor: colors.primary }]}>
 
+        {/* My Properties section of Home screen */}
         <Text style={[styles.headers]}>My Properties</Text>
-
         <ScrollView 
           style={[styles.properties]} 
           horizontal={true} 
@@ -173,8 +184,8 @@ export default function Home({ navigation, triggerDelete }) {
           ))}
         </ScrollView>
 
+        {/* Recently Added Section of Home Screen */}
         <Text style={[styles.headers]}>Recently Added</Text>
-
         <View style={styles.recent}>
           <FlatList
             data={recentEntries}
@@ -185,8 +196,8 @@ export default function Home({ navigation, triggerDelete }) {
           />
         </View>
 
+        {/* Inventory Summary Section */}
         <Text style={[styles.headers]}>Inventory Value</Text>
-
         <View style={styles.summaries}>
           <Card width={120} height={100} style={{ marginRight: 10 }}>
             <Text style={styles.general_text}>Total Items</Text>
@@ -204,6 +215,7 @@ export default function Home({ navigation, triggerDelete }) {
   );
 }
 
+// Styling for Home Screen and components
 const styles = StyleSheet.create({
   container: {
     flex: 1,

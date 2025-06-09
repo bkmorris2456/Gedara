@@ -5,11 +5,13 @@ import { Provider as PaperProvider, Text, Surface, Button } from 'react-native-p
 import { theme } from '../theme';
 import { getAuth, signOut } from 'firebase/auth';
 
+// Seetings Screen
 export default function Settings({ navigation }) {
 
   const { colors } = theme;
   const auth = getAuth();
 
+  // Logs the user out and resets auth state
   const handleLogout = () => {
     signOut(auth)
       .then(() => {
@@ -20,9 +22,9 @@ export default function Settings({ navigation }) {
       });
   };
 
+  // Render Settings screen
   return (
     <Template navigation={navigation}>
-      
       <ScrollView 
       contentContainerStyle={styles.scrollContainer}
       showsVerticalScrollIndicator={false} // Hides the vertical scrollbar
@@ -31,43 +33,31 @@ export default function Settings({ navigation }) {
 
         <Text style={styles.headers}>User Settings</Text>
 
+        {/* Current placeholder image for Profile Picture functionality */}
         <View style={[styles.pic, { width: 100, height: 100, borderRadius: 100 / 2 }]}>
           {/* <Image source={source} style={[styles.image, { width: , height: size, borderRadius: size / 2 }]} /> */}
           <Text style={{justifyContent: "center", alignItems: "center", display: "flex"}}>Profile Pic</Text>
         </View>
 
+        {/* Form for updating user info */}
         <View style={[styles.settings_form, { backgroundColor: colors.primary }]}>
 
           <View style={styles.inputContainers}>
-
             <Text style={styles.inputLabels}>Full Name</Text>
-            <TextInput style={[styles.inputs]}>
-
-            </TextInput>
-
+            <TextInput style={[styles.inputs]}/>
           </View>
 
-
           <View style={styles.inputContainers}>
-
             <Text style={styles.inputLabels}>Email</Text>
-            <TextInput style={[styles.inputs]}>
-
-            </TextInput>
-
+            <TextInput style={[styles.inputs]}/>
           </View>
 
           <View style={styles.inputContainers}>
-
             <Text style={styles.inputLabels}>Password</Text>
-            <TextInput style={[styles.inputs]}>
-
-            </TextInput>
-
+            <TextInput style={[styles.inputs]}/>
           </View>
 
           <View style={styles.buttonContainer}>
-
             <Button
               mode="contained"
               onPress={() => console.log("Save pressed")}
@@ -75,11 +65,11 @@ export default function Settings({ navigation }) {
             >
               <Text>Save Changes</Text>
             </Button>
-
           </View>
 
         </View>
 
+        {/* Button for user logout */}
         <Button
           mode="contained"
           onPress={handleLogout}
@@ -94,6 +84,7 @@ export default function Settings({ navigation }) {
   );
 }
 
+// Settings Screen Styling
 const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1, // Ensures the scroll view takes the full height
@@ -112,7 +103,7 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   settings_form: {
-    width: '350',
+    width: 350,
     height: 'auto',
     alignItems: 'center',
   },

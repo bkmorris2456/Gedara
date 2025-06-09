@@ -1,56 +1,28 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
 import { Provider as PaperProvider, Text, Surface } from 'react-native-paper';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { theme } from '../theme';
-
-// Import screens
-import Home from '../pages/home';
-import Inventory from '../pages/inventory';
-import Profile from '../pages/settings';
 
 // Import MenuButton and associated modals
 import MenuButton from '../components/MenuButton';
 import HomeModal from './modals/homeModal';
 import RoomModal from './modals/roomModal';
 import ItemModal from './modals/itemModal';
-import EditModal from './modals/editModal';
 
-// Placeholder logo
+// Static assets
 const logo = require('../../assets/favicon.png');
 const Tab = createBottomTabNavigator();
 
+// Template component wraps each screen with header and modals
 const Template = ({ children, navigation, onHomeAdded }) => {
   const { colors } = theme;
-  const [selectedModal, setSelectedModal] = useState(null);
-  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState(null);
+  const [selectedModal, setSelectedModal] = useState(null); // Track which modal is open
 
+  // Handle selection from the header menu
   const handleMenuSelect = (option) => {
     setSelectedModal(option);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!itemToDelete) return;
-
-    const { id, type } = itemToDelete;
-    let collectionName = '';
-    if (type === 'Property') collectionName = 'properties';
-    else if (type === 'Room') collectionName = 'rooms';
-    else if (type === 'Item') collectionName = 'items';
-
-    try {
-      const { doc, deleteDoc } = await import('firebase/firestore');
-      await deleteDoc(doc(require('../../config').db, collectionName, id));
-      console.log(`${type} deleted:`, id);
-    } catch (error) {
-      console.error('Delete failed:', error);
-    } finally {
-      setDeleteModalVisible(false);
-      setItemToDelete(null);
-    }
   };
 
   return (
@@ -59,14 +31,18 @@ const Template = ({ children, navigation, onHomeAdded }) => {
 
         {/* Header Bar */}
         <Surface style={[styles.header, { backgroundColor: colors.primary }]} elevation={4}>
+
+          {/* App Logo */}
           <Image source={logo} style={styles.logo} />
 
+          {/* Center title that redirects back to home screen */}
           <TouchableOpacity onPress={() => {
             navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
           }}>
             <Text variant="titleLarge" style={[styles.title, { color: colors.text }]}>Gedara</Text>
           </TouchableOpacity>
-
+          
+          {/* Right side menu button */}
           <MenuButton onSelect={handleMenuSelect} />
         </Surface>
 
@@ -80,8 +56,13 @@ const Template = ({ children, navigation, onHomeAdded }) => {
             onClose={() => setSelectedModal(null)}
             onHomeAdded={onHomeAdded}
           />
-          <RoomModal visible={selectedModal === 'Room'} onClose={() => setSelectedModal(null)} />
-          <ItemModal visible={selectedModal === 'Item'} onClose={() => setSelectedModal(null)} />
+          <RoomModal 
+            visible={selectedModal === 'Room'} 
+            onClose={() => setSelectedModal(null)} 
+          />
+          <ItemModal 
+            visible={selectedModal === 'Item'} 
+            onClose={() => setSelectedModal(null)} />
         </View>
 
       </SafeAreaView>
@@ -89,6 +70,7 @@ const Template = ({ children, navigation, onHomeAdded }) => {
   );
 };
 
+// Template Styling
 const styles = StyleSheet.create({
   safeContainer: { flex: 1 },
   header: {

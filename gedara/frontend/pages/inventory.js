@@ -7,32 +7,39 @@ import { theme } from '../theme';
 import { auth, db } from '../../config';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 
+// Inventory Screen 
 export default function Inventory({ navigation }) {
   const { colors } = theme;
-  const [properties, setProperties] = useState([]);
+  const [properties, setProperties] = useState([]); // State to hold user property data
 
+  // Fetch user's properties from Firestore in real-time
   useEffect(() => {
     const userId = auth.currentUser?.uid;
     if (!userId) return;
 
+    // Query to find properties that only belong to logged in user
     const propertiesQuery = query(
       collection(db, 'properties'),
       where('userId', '==', userId)
     );
 
+    // Real-time Firestore listener
     const unsubscribe = onSnapshot(propertiesQuery, (snapshot) => {
       const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setProperties(data);
+      setProperties(data); // Update state with fetched properties
     });
 
-    return () => unsubscribe();
+    return () => unsubscribe(); // Cleanup listener on unmount
   }, []);
 
+  // Render Inventory Screen
   return (
     <Template navigation={navigation}>
       <View style={[styles.container, { backgroundColor: colors.primary }]}>
+
         <Text style={[styles.headers]}>Properties</Text>
 
+        {/* Scrollable list of all user-owned properties */}
         <ScrollView style={styles.properties} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20, gap: 15 }}>
           {properties.map((property) => (
             <Card
@@ -55,6 +62,7 @@ export default function Inventory({ navigation }) {
   );
 }
 
+// Inventory Screen and component styling
 const styles = StyleSheet.create({
   container: {
     flex: 1,
