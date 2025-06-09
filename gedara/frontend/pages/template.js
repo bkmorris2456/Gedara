@@ -16,7 +16,7 @@ import MenuButton from '../components/MenuButton';
 import HomeModal from './modals/homeModal';
 import RoomModal from './modals/roomModal';
 import ItemModal from './modals/itemModal';
-import EditModal from './modals/editModal';
+// import EditModal from './modals/editModal';
 
 // Placeholder logo
 const logo = require('../../assets/favicon.png');
@@ -87,13 +87,13 @@ const Template = ({ children, navigation, onHomeAdded }) => {
           />
           <RoomModal visible={selectedModal === 'Room'} onClose={() => setSelectedModal(null)} />
           <ItemModal visible={selectedModal === 'Item'} onClose={() => setSelectedModal(null)} />
-          <EditModal
+          {/* <EditModal
             visible={deleteModalVisible}
             onClose={() => setDeleteModalVisible(false)}
             onConfirm={handleConfirmDelete}
             title={`Delete ${itemToDelete?.type}`}
             message={`Are you sure you want to delete this ${itemToDelete?.type?.toLowerCase()}? This action cannot be undone.`}
-          />
+          /> */}
         </View>
 
       </SafeAreaView>

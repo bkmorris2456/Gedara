@@ -118,7 +118,7 @@ export default function Home({ navigation, triggerDelete }) {
           }
         }}
         onEdit={() => console.log(`Edit ${type} ${item.id}`)}
-        onDelete={() => triggerDelete({ id: prop.id, type: 'Property' })}
+        onDelete={() => console.log(`delete pressed`)}
       />
     );
   };
@@ -168,7 +168,7 @@ export default function Home({ navigation, triggerDelete }) {
                 title: prop.propName,
               })}
               onEdit={() => console.log(`Edit Property ${prop.id}`)}
-              onDelete={() => triggerDelete({ id: prop.id, type: 'Property' })}
+              onDelete={() => console.log(`delete pressed`)}
             />
           ))}
         </ScrollView>
