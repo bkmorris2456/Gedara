@@ -12,20 +12,20 @@ import {
   onSnapshot
 } from 'firebase/firestore';
 
-export default function Home({ navigation }) {
+export default function Home({ navigation, triggerDelete }) {
   const { colors } = theme;
   const [props, setProps] = useState([]);
-  const [homes, setHomes] = useState([]);
+  const [properties, setProperties] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [items, setItems] = useState([]);
   const [recentEntries, setRecentEntries] = useState([]);
 
-  // Real-time listeners for homes, rooms, and items
+  // Real-time listeners for properties, rooms, and items
   useEffect(() => {
     const userId = auth.currentUser?.uid;
     if (!userId) return;
 
-    const homesQuery = query(
+    const propertiesQuery = query(
       collection(db, 'properties'),
       where('userId', '==', userId)
     );
@@ -38,13 +38,13 @@ export default function Home({ navigation }) {
       where('userId', '==', userId)
     );
 
-    const unsubHomes = onSnapshot(homesQuery, (snapshot) => {
+    const unsubProperties = onSnapshot(propertiesQuery, (snapshot) => {
       const data = snapshot.docs.map(doc => ({
         ...doc.data(),
         id: doc.id,
-        type: 'Home',
+        type: 'Property',
       }));
-      setHomes(data);
+      setProperties(data);
     });
 
     const unsubRooms = onSnapshot(roomsQuery, (snapshot) => {
@@ -67,7 +67,7 @@ export default function Home({ navigation }) {
 
     // Cleanup listeners
     return () => {
-      unsubHomes();
+      unsubProperties();
       unsubRooms();
       unsubItems();
     };
@@ -75,32 +75,51 @@ export default function Home({ navigation }) {
 
   // Merge and sort all entries
   useEffect(() => {
-    const all = [...homes, ...rooms, ...items];
+    const all = [...properties, ...rooms, ...items];
     const sorted = all
       .filter(entry => entry.createdAt)
       .sort((a, b) => b.createdAt?.seconds - a.createdAt?.seconds)
       .slice(0, 5);
     setRecentEntries(sorted);
-  }, [homes, rooms, items]);
+  }, [properties, rooms, items]);
 
   const renderItem = ({ item }) => {
     let displayName = '';
+    let type = item.type;
 
-    if (item.type === 'Home') {
+    if (type === 'Property') {
       displayName = item.propName || 'Unnamed Property';
-    } else if (item.type === 'Room') {
+    } else if (type === 'Room') {
       displayName = item.roomName || 'Unnamed Room';
-    } else if (item.type === 'Item') {
+    } else if (type === 'Item') {
       displayName = item.itemName || 'Unnamed Item';
     }
 
     return (
-      <Card width="80%" height={80} style={{ marginBottom: 10 }}>
-        <View>
-          <Text style={styles.entryType}>{item.type}</Text>
-          <Text style={styles.entryName}>{displayName}</Text>
-        </View>
-      </Card>
+      <Card
+        width="90%"
+        height={100}
+        title={displayName}
+        type={type}
+        // Optional: Add navigation for each item type if desired
+        onPress={() => {
+          if (type === 'Property') {
+            navigation.navigate('DetailScreen', {
+              parentId: item.id,
+              parentType: 'property',
+              title: displayName,
+            });
+          } else if (type === 'Room') {
+            navigation.navigate('DetailScreen', {
+              parentId: item.id,
+              parentType: 'room',
+              title: displayName,
+            });
+          }
+        }}
+        onEdit={() => console.log(`Edit ${type} ${item.id}`)}
+        onDelete={() => triggerDelete({ id: prop.id, type: 'Property' })}
+      />
     );
   };
 
@@ -130,21 +149,27 @@ export default function Home({ navigation }) {
 
         <Text style={[styles.headers]}>My Properties</Text>
 
-        <ScrollView style={[styles.properties]} horizontal={true} showsHorizontalScrollIndicator={false}>
+        <ScrollView 
+          style={[styles.properties]} 
+          horizontal={true} 
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingLeft: 10, gap: 15 }}
+        >
           {props.map((prop) => (
             <Card
               key={prop.id}
-              width={180}
+              width={340}
               height={125}
-              style={{ marginRight: 10 }}
+              title={prop.propName}
+              type="Property"
               onPress={() => navigation.navigate('DetailScreen', {
                 parentId: prop.id,
                 parentType: 'property',
                 title: prop.propName,
               })}
-            >
-              <Text style={styles.general_text}>{prop.propName}</Text>
-            </Card>
+              onEdit={() => console.log(`Edit Property ${prop.id}`)}
+              onDelete={() => triggerDelete({ id: prop.id, type: 'Property' })}
+            />
           ))}
         </ScrollView>
 
@@ -156,6 +181,7 @@ export default function Home({ navigation }) {
             keyExtractor={(item) => item.id}
             renderItem={renderItem}
             ListEmptyComponent={<Text style={{ color: '#fff' }}>No recent entries</Text>}
+            contentContainerStyle={{gap: 10}}
           />
         </View>
 

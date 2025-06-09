@@ -12,9 +12,9 @@ import Inventory from './frontend/pages/inventory';
 import Settings from './frontend/pages/settings';
 
 // Import modals
-import HomeModal from './frontend/pages/creation-pages/homeModal';
-import RoomModal from './frontend/pages/creation-pages/roomModal';
-import ItemModal from './frontend/pages/creation-pages/itemModal';
+import HomeModal from './frontend/pages/modals/homeModal';
+import RoomModal from './frontend/pages/modals/roomModal';
+import ItemModal from './frontend/pages/modals/itemModal';
 import { useSegments } from 'expo-router';
 import { AuthProvider } from './firebase/AuthContext';
 import RootNavigator from './frontend/components/RootNavigator';

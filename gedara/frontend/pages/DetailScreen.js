@@ -48,22 +48,26 @@ export default function DetailScreen({ navigation }) {
       <View style={[styles.container, { backgroundColor: colors.primary }]}>
         <Text style={styles.headers}>{title}</Text>
 
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 15 }}>
           {children.map(child => (
             <Card
               key={child.id}
-              width={300}
-              height={100}
-              style={{ marginVertical: 10 }}
+              width={350}
+              height={120}
+              title={child.roomName || child.itemName}
+              type={parentType === 'property' ? 'Room' : 'Item'}
               onPress={() => {
                 if (parentType === 'property') {
-                  navigation.push('DetailScreen', { parentId: child.id, parentType: 'room', title: child.roomName });
+                  navigation.push('DetailScreen', {
+                    parentId: child.id,
+                    parentType: 'room',
+                    title: child.roomName,
+                  });
                 }
               }}
-              variant="light"
-            >
-              <Text style={styles.general_text}>{child.roomName || child.itemName}</Text>
-            </Card>
+              onEdit={() => console.log(`Edit ${child.id}`)}
+              onDelete={() => console.log(`Delete ${child.id}`)}
+            />
           ))}
         </ScrollView>
       </View>

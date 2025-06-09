@@ -9,20 +9,20 @@ import { collection, query, where, onSnapshot } from 'firebase/firestore';
 
 export default function Inventory({ navigation }) {
   const { colors } = theme;
-  const [homes, setHomes] = useState([]);
+  const [properties, setProperties] = useState([]);
 
   useEffect(() => {
     const userId = auth.currentUser?.uid;
     if (!userId) return;
 
-    const homesQuery = query(
+    const propertiesQuery = query(
       collection(db, 'properties'),
       where('userId', '==', userId)
     );
 
-    const unsubscribe = onSnapshot(homesQuery, (snapshot) => {
+    const unsubscribe = onSnapshot(propertiesQuery, (snapshot) => {
       const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setHomes(data);
+      setProperties(data);
     });
 
     return () => unsubscribe();
@@ -31,19 +31,24 @@ export default function Inventory({ navigation }) {
   return (
     <Template navigation={navigation}>
       <View style={[styles.container, { backgroundColor: colors.primary }]}>
-        <Text style={[styles.headers]}>Homes</Text>
+        <Text style={[styles.headers]}>Properties</Text>
 
-        <ScrollView style={styles.properties} showsVerticalScrollIndicator={false}>
-          {homes.map((home) => (
+        <ScrollView style={styles.properties} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20, gap: 15 }}>
+          {properties.map((property) => (
             <Card
-              key={home.id}
-              width={300}
-              height={100}
-              style={{ marginVertical: 10 }}
-              onPress={() => navigation.navigate('DetailScreen', { parentId: home.id, parentType: 'property', title: home.propName })}
-            >
-              <Text style={styles.general_text}>{home.propName}</Text>
-            </Card>
+              key={property.id}
+              width={350}
+              height={120}
+              title={property.propName}
+              type="Property"
+              onPress={() => navigation.navigate('DetailScreen', {
+                parentId: property.id,
+                parentType: 'property',
+                title: property.propName,
+              })}
+              onEdit={() => console.log(`Edit Property ${property.id}`)}
+              onDelete={() => console.log(`Delete Property ${property.id}`)}
+            />
           ))}
         </ScrollView>
       </View>
@@ -65,7 +70,7 @@ const styles = StyleSheet.create({
   properties: {
     flexGrow: 1,
     maxHeight: 350,
-    width: '100%',
+    width: '100%'
   },
   general_text: {
     color: '#fff',
