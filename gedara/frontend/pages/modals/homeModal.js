@@ -1,112 +1,93 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  TextInput, 
-  Button, 
-  Modal, 
-  StyleSheet 
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  Modal,
+  StyleSheet,
+  Alert,
 } from 'react-native';
 import { theme } from '../../theme';
-import { auth, db } from '../../../config';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { auth } from '../../../config';
+import { addNewProperty } from '../../../firebase/firebaseHelpers'; // ✅ NEW
 
 // Modal component for adding a new property
 const HomeModal = ({ visible, onClose, onHomeAdded }) => {
+  const [propertyName, setPropertyName] = useState('');
+  const [roomCount, setRoomCount] = useState('');
+  const [propertyValue, setPropertyValue] = useState('');
 
-  // State variables and input fields
-  const [propName, setPropName] = useState('');
-  const [roomTotal, setRoomTotal] = useState('');
-  const [propValue, setPropValue] = useState('');
-
-  // Function to validate input information and add new property
-  const addProperty = async () => {
+  const handleAddProperty = async () => {
     const user = auth.currentUser;
 
-    // Check if user is authenticated
     if (!user) {
-      alert('No user signed in.');
+      Alert.alert('No user signed in.');
       return;
     }
 
-    // Ensures all fields are filled
-    if (!propName || !roomTotal || !propValue) {
-      alert('Please fill in all fields.');
+    if (!propertyName || !roomCount || !propertyValue) {
+      Alert.alert('Please fill in all fields.');
       return;
     }
 
-    // Prevent any invalid characters
-    if (propName.includes('/')) {
-      alert('Property name cannot contain "/" character.');
+    if (propertyName.includes('/')) {
+      Alert.alert('Property name cannot contain "/" character.');
       return;
     }
 
     try {
-
-      // Clean and format input data
-      const validPropData = {
-        propName: propName.trim(),
-        roomTotal: parseInt(roomTotal, 10),
-        propValue: parseFloat(propValue),
-        userId: user.uid,
-        createdAt: serverTimestamp(), // Timestamp to track creation time
+      const propertyData = {
+        propName: propertyName.trim(),
+        roomTotal: parseInt(roomCount, 10),
+        propValue: parseFloat(propertyValue),
       };
 
-      const propertiesRef = collection(db, 'properties'); // Reference to Firestore "properties" collection
+      await addNewProperty(user.uid, propertyData);
 
-      // Auto-generate a unique ID and add document
-      await addDoc(propertiesRef, validPropData);
+      Alert.alert('Property added successfully!');
+      if (onHomeAdded) onHomeAdded();
 
-      alert('Property added successfully!');
-
-      // Callback to refresh data in parent component
-      if (onHomeAdded) {
-        onHomeAdded(); // Refresh the home list
-      }
-
-      // Clear input fields and close modal
-      setPropName('');
-      setRoomTotal('');
-      setPropValue('');
+      setPropertyName('');
+      setRoomCount('');
+      setPropertyValue('');
       onClose();
-
     } catch (error) {
-      alert('Error adding home: ' + error.message);
+      Alert.alert('Error adding home: ' + error.message);
     }
   };
 
-  // Modal display
   return (
     <Modal visible={visible} animationType="fade" transparent>
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
-          <Text style={styles.title}>Add Home</Text>
+          <Text style={styles.title}>Add Property</Text>
           <TextInput
             style={styles.input}
             placeholder="Property Name"
             placeholderTextColor="#aaa"
-            value={propName}
-            onChangeText={setPropName}
+            value={propertyName}
+            onChangeText={setPropertyName}
           />
           <TextInput
             style={styles.input}
             placeholder="# of Rooms"
             placeholderTextColor="#aaa"
-            value={roomTotal}
-            onChangeText={setRoomTotal}
-            keyboardType="numeric" // Ensures numeric input
+            value={roomCount}
+            onChangeText={setRoomCount}
+            keyboardType="numeric"
           />
           <TextInput
             style={styles.input}
             placeholder="Estimated Property Value"
             placeholderTextColor="#aaa"
-            value={propValue}
-            onChangeText={setPropValue}
-            keyboardType="numeric" // Ensures numeric input
+            value={propertyValue}
+            onChangeText={setPropertyValue}
+            keyboardType="numeric"
           />
           <View style={styles.buttonStructure}>
             <Button title="Close" onPress={onClose} color="red" />
-            <Button title="Submit" onPress={addProperty} />
+            <Button title="Submit" onPress={handleAddProperty} />
           </View>
         </View>
       </View>
@@ -114,7 +95,6 @@ const HomeModal = ({ visible, onClose, onHomeAdded }) => {
   );
 };
 
-// Modal UI Styling
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,

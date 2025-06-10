@@ -54,7 +54,6 @@ const Template = ({ children, navigation, onHomeAdded }) => {
           <HomeModal 
             visible={selectedModal === 'Home'} 
             onClose={() => setSelectedModal(null)}
-            onHomeAdded={onHomeAdded}
           />
           <RoomModal 
             visible={selectedModal === 'Room'} 

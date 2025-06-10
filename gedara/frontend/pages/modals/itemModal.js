@@ -1,91 +1,80 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, Modal, StyleSheet, Alert } from 'react-native';
-import { theme } from '../../theme';
-import { auth, db } from '../../../config';
-import { collection, getDocs, addDoc, query, where, serverTimestamp } from 'firebase/firestore';
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  Modal,
+  StyleSheet,
+  Alert,
+} from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import { auth } from '../../../config';
+import {
+  getUserProperties,
+  getRoomsForProperty,
+  addItemToRoom,
+} from '../../../firebase/firebaseHelpers';
 
-// Modal component to add items to a given room within a specific property
-const ItemModal = ({ visible, onClose }) => {
-
-  // State variables for form fields and data
+const ItemModal = ({ visible, onClose, onItemAdded }) => {
   const [itemName, setItemName] = useState('');
-  const [itemQuant, setItemQuant] = useState('');
-  const [estValue, setEstValue] = useState('');
-  const [props, setProps] = useState([]);
+  const [itemQuantity, setItemQuantity] = useState('');
+  const [estimatedValue, setEstimatedValue] = useState('');
+  const [properties, setProperties] = useState([]);
   const [rooms, setRooms] = useState([]);
-  const [selectedProp, setSelectedProp] = useState('');
-  const [selectedRoom, setSelectedRoom] = useState('');
+  const [selectedPropertyId, setSelectedPropertyId] = useState('');
+  const [selectedRoomId, setSelectedRoomId] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
-  const { colors } = theme;
-
-  // Fetch properties when modal is visible
+  // Fetch properties when modal is shown
   useEffect(() => {
-    const fetchProps = async () => {
+    const fetchProperties = async () => {
       const user = auth.currentUser;
       if (!user) return;
 
       try {
-        const propsQuery = query(
-          collection(db, 'properties'),
-          where('userId', '==', user.uid)
-        );
-        const querySnapshot = await getDocs(propsQuery);
-
-        // Store list of properties for Picker
-        const propsList = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setProps(propsList);
+        const userProps = await getUserProperties(user.uid);
+        setProperties(userProps);
       } catch (error) {
-        console.error('Error fetching properties: ', error);
+        console.error('Error fetching properties:', error);
       }
     };
 
     if (visible) {
-      fetchProps();
-      // Reset form fields and related state
-      setSelectedProp('');
-      setSelectedRoom('');
+      fetchProperties();
+      setSelectedPropertyId('');
+      setSelectedRoomId('');
       setRooms([]);
+      setItemName('');
+      setItemQuantity('');
+      setEstimatedValue('');
     }
   }, [visible]);
 
-  // Fetch rooms when a property is selected
+  // Fetch rooms when property changes
   useEffect(() => {
     const fetchRooms = async () => {
       const user = auth.currentUser;
-      if (!user || !selectedProp) return;
+      if (!user || !selectedPropertyId) return;
 
       try {
-        const roomsQuery = query(
-          collection(db, 'rooms'),
-          where('homeId', '==', selectedProp),
-          where('userId', '==', user.uid)
-        );
-        const querySnapshot = await getDocs(roomsQuery);
-
-        // Store rooms to allow selection
-        const roomsList = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setRooms(roomsList);
-        setSelectedRoom(''); // Reset room selection when home changes
+        const userRooms = await getRoomsForProperty(user.uid, selectedPropertyId);
+        setRooms(userRooms);
       } catch (error) {
-        console.error('Error fetching rooms: ', error);
+        console.error('Error fetching rooms:', error);
       }
     };
 
-    fetchRooms();
-  }, [selectedProp]);
+    if (selectedPropertyId) {
+      fetchRooms();
+    }
+  }, [selectedPropertyId]);
 
-  // Add new item to Firestore
-  const addItem = async () => {
+  // Submit item
+  const handleAddItem = async () => {
+    if (submitting) return;
 
-    // Validate all fields
-    if (!itemName || !itemQuant || !estValue || !selectedProp || !selectedRoom) {
+    if (!itemName || !itemQuantity || !estimatedValue || !selectedPropertyId || !selectedRoomId) {
       Alert.alert('Please fill in all fields.');
       return;
     }
@@ -96,33 +85,33 @@ const ItemModal = ({ visible, onClose }) => {
     }
 
     try {
+      setSubmitting(true);
       const user = auth.currentUser;
-      if (user) {
-        const itemData = {
-          itemName: itemName.trim(),
-          quantity: parseInt(itemQuant),
-          estVal: parseFloat(estValue),
-          roomId: selectedRoom,
-          userId: user.uid,
-          createdAt: serverTimestamp(),
-        };
+      if (!user) return;
 
-        const itemsRef = collection(db, 'items');
-        await addDoc(itemsRef, itemData);
+      const itemData = {
+        itemName: itemName.trim(),
+        quantity: parseInt(itemQuantity),
+        estVal: parseFloat(estimatedValue),
+        roomId: selectedRoomId,
+      };
 
-        Alert.alert('Item added successfully!');
+      await addItemToRoom(user.uid, itemData);
 
-        // Clear form and close modal
-        setItemName('');
-        setItemQuant('');
-        setEstValue('');
-        setSelectedRoom('');
-        setSelectedProp('');
-        onClose();
-      }
+      Alert.alert('Item added successfully!');
+      if (onItemAdded) onItemAdded();
+
+      setItemName('');
+      setItemQuantity('');
+      setEstimatedValue('');
+      setSelectedPropertyId('');
+      setSelectedRoomId('');
+      onClose();
     } catch (error) {
-      console.error('Error adding item: ', error);
+      console.error('Error adding item:', error);
       Alert.alert('Error adding item: ' + error.message);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -134,30 +123,37 @@ const ItemModal = ({ visible, onClose }) => {
 
           {/* Property Picker */}
           <Picker
-            selectedValue={selectedProp}
-            onValueChange={(itemValue) => setSelectedProp(itemValue)}
+            selectedValue={selectedPropertyId}
+            onValueChange={setSelectedPropertyId}
             style={{ width: '100%', height: 50 }}
           >
             <Picker.Item label="Select Property" value="" />
-            {props.map((home) => (
-              <Picker.Item key={home.id} label={home.propName || "Unnamed Home"} value={home.id} />
+            {properties.map((home) => (
+              <Picker.Item
+                key={home.id}
+                label={home.propName || 'Unnamed Home'}
+                value={home.id}
+              />
             ))}
           </Picker>
 
           {/* Room Picker */}
           <Picker
-            selectedValue={selectedRoom}
-            onValueChange={(itemValue) => setSelectedRoom(itemValue)}
+            selectedValue={selectedRoomId}
+            onValueChange={setSelectedRoomId}
             style={{ width: '100%', height: 50, marginTop: 10 }}
             enabled={rooms.length > 0}
           >
-            <Picker.Item label={rooms.length > 0 ? "Select Room" : "No Rooms Found"} value="" />
+            <Picker.Item
+              label={rooms.length > 0 ? 'Select Room' : 'No Rooms Found'}
+              value=""
+            />
             {rooms.map((room) => (
               <Picker.Item key={room.id} label={room.roomName} value={room.id} />
             ))}
           </Picker>
 
-          {/* Inputs */}
+          {/* Item Fields */}
           <TextInput
             style={styles.input}
             placeholder="Enter Item Name"
@@ -169,21 +165,26 @@ const ItemModal = ({ visible, onClose }) => {
             style={styles.input}
             placeholder="Enter Quantity"
             placeholderTextColor="#aaa"
-            value={itemQuant}
-            onChangeText={setItemQuant}
+            value={itemQuantity}
+            onChangeText={setItemQuantity}
             keyboardType="numeric"
           />
           <TextInput
             style={styles.input}
             placeholder="Enter Est. Value"
             placeholderTextColor="#aaa"
-            value={estValue}
-            onChangeText={setEstValue}
+            value={estimatedValue}
+            onChangeText={setEstimatedValue}
             keyboardType="numeric"
           />
+
           <View style={styles.buttonStructure}>
             <Button title="Close" onPress={onClose} color="red" />
-            <Button title="Submit" onPress={addItem} />
+            <Button
+              title="Submit"
+              onPress={handleAddItem}
+              disabled={submitting}
+            />
           </View>
         </View>
       </View>
@@ -191,7 +192,6 @@ const ItemModal = ({ visible, onClose }) => {
   );
 };
 
-// Modal Styling
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,

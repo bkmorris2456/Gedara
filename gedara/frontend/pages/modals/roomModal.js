@@ -1,50 +1,52 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Button, Modal, StyleSheet, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  Modal,
+  StyleSheet,
+  Alert,
+} from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { auth, db } from '../../../config';
-import { collection, getDocs, addDoc, doc, serverTimestamp, setDoc, runTransaction } from 'firebase/firestore';
+import { auth } from '../../../config';
+import {
+  getUserProperties,
+  addRoomToProperty,
+} from '../../../firebase/firebaseHelpers';
 
-// Modal component for the addition of rooms to a selected property
-const RoomModal = ({ visible, onClose }) => {
-
-  // State to manage input and selection
+const RoomModal = ({ visible, onClose, onRoomAdded }) => {
   const [roomName, setRoomName] = useState('');
-  const [selectedProp, setSelectedProp] = useState('');
-  const [props, setProps] = useState([]);
+  const [selectedPropertyId, setSelectedPropertyId] = useState('');
+  const [properties, setProperties] = useState([]);
+  const [submitting, setSubmitting] = useState(false);
 
-  // Fetch properties when modal is opened
+  // Fetch properties when modal opens
   useEffect(() => {
-    const fetchProps = async () => {
+    const fetchProperties = async () => {
       const user = auth.currentUser;
       if (user) {
         try {
-          const allPropsRef = collection(db, 'properties');
-          const querySnapshot = await getDocs(allPropsRef);
-
-          // Filter properties belonging to the current user
-          const userProps = querySnapshot.docs
-            .filter(doc => doc.data().userId === user.uid)
-            .map(doc => ({
-              id: doc.id,
-              ...doc.data(),
-            }));
-          setProps(userProps);
+          const userProps = await getUserProperties(user.uid);
+          setProperties(userProps);
         } catch (error) {
-          console.error('Error fetching properties: ', error);
+          console.error('Error fetching properties:', error);
         }
       }
     };
 
-    // Trigger fetching only wehn modal becomes visible
     if (visible) {
-      fetchProps();
+      fetchProperties();
+      setRoomName('');
+      setSelectedPropertyId('');
     }
   }, [visible]);
 
-  // Function to add a new room to user's selected property
-  const addRoom = async () => {
-    // Validate form input
-    if (!roomName || !selectedProp) {
+  // Submit new room
+  const handleAddRoom = async () => {
+    if (submitting) return;
+
+    if (!roomName || !selectedPropertyId) {
       Alert.alert('Please fill in all fields.');
       return;
     }
@@ -55,68 +57,49 @@ const RoomModal = ({ visible, onClose }) => {
     }
 
     try {
+      setSubmitting(true);
       const user = auth.currentUser;
       if (!user) return;
 
-      const roomRef = doc(collection(db, 'rooms')); // Create new doc reference for room
-      const propertyRef = doc(db, 'properties', selectedProp); // Reference to the selected property
-
-      // Firestore transaction to update both room and associated property
-      await runTransaction(db, async (transaction) => {
-        const propDoc = await transaction.get(propertyRef);
-        if (!propDoc.exists()) {
-          throw new Error('Property does not exist');
-        }
-
-        const currentTotal = propDoc.data().roomTotal || 0;
-
-        // Set the new room document
-        transaction.set(roomRef, {
-          roomName: roomName.trim(),
-          homeId: selectedProp,
-          userId: user.uid,
-          estVal: 0, // Default estimated value
-          createdAt: serverTimestamp(),
-        });
-
-        transaction.update(propertyRef, {
-          roomTotal: currentTotal + 1,
-        });
-      });
+      await addRoomToProperty(user.uid, roomName, selectedPropertyId);
 
       Alert.alert('Room added successfully!');
-      // Clear fields and close modal
-      setRoomName('');
-      setSelectedProp('');
-      onClose();
+      if (onRoomAdded) onRoomAdded();
 
+      setRoomName('');
+      setSelectedPropertyId('');
+      onClose();
     } catch (error) {
-      console.error('Error adding room: ', error);
+      console.error('Error adding room:', error);
       Alert.alert('Error adding room: ' + error.message);
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  // Modal display
   return (
     <Modal visible={visible} animationType="fade" transparent>
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <Text style={styles.title}>Add Room</Text>
 
-          {/* Homes Picker */}
-          {props.length > 0 && (
-            <Picker
-              selectedValue={selectedProp}
-              onValueChange={(itemValue) => setSelectedProp(itemValue)}
-              style={{ width: '100%', height: 'auto' }}
-            >
-              <Picker.Item label="Select Property" value="" />
-              {props.map((prop) => (
-                <Picker.Item key={prop.id} label={prop.propName} value={prop.id} />
-              ))}
-            </Picker>
-          )}
+          {/* Property Picker */}
+          <Picker
+            selectedValue={selectedPropertyId}
+            onValueChange={(itemValue) => setSelectedPropertyId(itemValue)}
+            style={{ width: '100%', height: 'auto' }}
+          >
+            <Picker.Item label="Select Property" value="" />
+            {properties.map((property) => (
+              <Picker.Item
+                key={property.id}
+                label={property.propName}
+                value={property.id}
+              />
+            ))}
+          </Picker>
 
+          {/* Room Name Input */}
           <TextInput
             style={styles.input}
             placeholder="Room Name"
@@ -127,7 +110,11 @@ const RoomModal = ({ visible, onClose }) => {
 
           <View style={styles.buttonStructure}>
             <Button title="Close" onPress={onClose} color="red" />
-            <Button title="Submit" onPress={addRoom} />
+            <Button
+              title="Submit"
+              onPress={handleAddRoom}
+              disabled={submitting}
+            />
           </View>
         </View>
       </View>
@@ -135,7 +122,6 @@ const RoomModal = ({ visible, onClose }) => {
   );
 };
 
-// Modal Styling
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
