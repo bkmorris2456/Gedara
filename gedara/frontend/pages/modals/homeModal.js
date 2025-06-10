@@ -11,6 +11,7 @@ import {
 import { theme } from '../../theme';
 import { auth } from '../../../config';
 import { addNewProperty } from '../../../firebase/firebaseHelpers'; // ✅ NEW
+import FormInput from '../../components/FormInput';
 
 // Modal component for adding a new property
 const HomeModal = ({ visible, onClose, onHomeAdded }) => {
@@ -62,25 +63,22 @@ const HomeModal = ({ visible, onClose, onHomeAdded }) => {
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <Text style={styles.title}>Add Property</Text>
-          <TextInput
-            style={styles.input}
+          <FormInput
             placeholder="Property Name"
-            placeholderTextColor="#aaa"
             value={propertyName}
             onChangeText={setPropertyName}
+            autoCapitalize="words"
           />
-          <TextInput
-            style={styles.input}
+
+          <FormInput
             placeholder="# of Rooms"
-            placeholderTextColor="#aaa"
             value={roomCount}
             onChangeText={setRoomCount}
             keyboardType="numeric"
           />
-          <TextInput
-            style={styles.input}
+
+          <FormInput
             placeholder="Estimated Property Value"
-            placeholderTextColor="#aaa"
             value={propertyValue}
             onChangeText={setPropertyValue}
             keyboardType="numeric"

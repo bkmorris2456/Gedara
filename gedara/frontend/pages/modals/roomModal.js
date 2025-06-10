@@ -14,6 +14,8 @@ import {
   getUserProperties,
   addRoomToProperty,
 } from '../../../firebase/firebaseHelpers';
+import FormInput from '../../components/FormInput';
+import DropdownPicker from '../../components/DropdownPicker';
 
 const RoomModal = ({ visible, onClose, onRoomAdded }) => {
   const [roomName, setRoomName] = useState('');
@@ -84,26 +86,16 @@ const RoomModal = ({ visible, onClose, onRoomAdded }) => {
           <Text style={styles.title}>Add Room</Text>
 
           {/* Property Picker */}
-          <Picker
+          <DropdownPicker
             selectedValue={selectedPropertyId}
-            onValueChange={(itemValue) => setSelectedPropertyId(itemValue)}
-            style={{ width: '100%', height: 'auto' }}
-          >
-            <Picker.Item label="Select Property" value="" />
-            {properties.map((property) => (
-              <Picker.Item
-                key={property.id}
-                label={property.propName}
-                value={property.id}
-              />
-            ))}
-          </Picker>
+            onValueChange={setSelectedPropertyId}
+            items={properties.map((p) => ({ id: p.id, label: p.propName }))}
+            prompt="Select Property"
+          />
 
           {/* Room Name Input */}
-          <TextInput
-            style={styles.input}
+          <FormInput
             placeholder="Room Name"
-            placeholderTextColor="#aaa"
             value={roomName}
             onChangeText={setRoomName}
           />

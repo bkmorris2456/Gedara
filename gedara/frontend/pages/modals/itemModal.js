@@ -15,6 +15,8 @@ import {
   getRoomsForProperty,
   addItemToRoom,
 } from '../../../firebase/firebaseHelpers';
+import FormInput from '../../components/FormInput';
+import DropdownPicker from '../../components/DropdownPicker';
 
 const ItemModal = ({ visible, onClose, onItemAdded }) => {
   const [itemName, setItemName] = useState('');
@@ -122,57 +124,37 @@ const ItemModal = ({ visible, onClose, onItemAdded }) => {
           <Text style={styles.title}>Add Item</Text>
 
           {/* Property Picker */}
-          <Picker
+          <DropdownPicker
             selectedValue={selectedPropertyId}
             onValueChange={setSelectedPropertyId}
-            style={{ width: '100%', height: 50 }}
-          >
-            <Picker.Item label="Select Property" value="" />
-            {properties.map((home) => (
-              <Picker.Item
-                key={home.id}
-                label={home.propName || 'Unnamed Home'}
-                value={home.id}
-              />
-            ))}
-          </Picker>
+            items={properties.map((p) => ({ id: p.id, label: p.propName || 'Unnamed Home' }))}
+            prompt="Select Property"
+          />
 
           {/* Room Picker */}
-          <Picker
+          <DropdownPicker
             selectedValue={selectedRoomId}
             onValueChange={setSelectedRoomId}
-            style={{ width: '100%', height: 50, marginTop: 10 }}
-            enabled={rooms.length > 0}
-          >
-            <Picker.Item
-              label={rooms.length > 0 ? 'Select Room' : 'No Rooms Found'}
-              value=""
-            />
-            {rooms.map((room) => (
-              <Picker.Item key={room.id} label={room.roomName} value={room.id} />
-            ))}
-          </Picker>
+            items={rooms.map((room) => ({ id: room.id, label: room.roomName }))}
+            prompt={rooms.length > 0 ? 'Select Room' : 'No Rooms Found'}
+          />
 
           {/* Item Fields */}
-          <TextInput
-            style={styles.input}
+          <FormInput
             placeholder="Enter Item Name"
-            placeholderTextColor="#aaa"
             value={itemName}
             onChangeText={setItemName}
           />
-          <TextInput
-            style={styles.input}
+
+          <FormInput
             placeholder="Enter Quantity"
-            placeholderTextColor="#aaa"
             value={itemQuantity}
             onChangeText={setItemQuantity}
             keyboardType="numeric"
           />
-          <TextInput
-            style={styles.input}
+
+          <FormInput
             placeholder="Enter Est. Value"
-            placeholderTextColor="#aaa"
             value={estimatedValue}
             onChangeText={setEstimatedValue}
             keyboardType="numeric"
