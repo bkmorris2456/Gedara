@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   },
   properties: {
     flexGrow: 1,
-    maxHeight: 350,
+    maxHeight: '100%',
     width: '100%'
   },
   general_text: {
