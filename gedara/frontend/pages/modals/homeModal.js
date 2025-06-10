@@ -12,6 +12,7 @@ import { theme } from '../../theme';
 import { auth } from '../../../config';
 import { addNewProperty } from '../../../firebase/firebaseHelpers'; // ✅ NEW
 import FormInput from '../../components/FormInput';
+import { validateFields } from '../../../firebase/validation';
 
 // Modal component for adding a new property
 const HomeModal = ({ visible, onClose, onHomeAdded }) => {
@@ -27,15 +28,13 @@ const HomeModal = ({ visible, onClose, onHomeAdded }) => {
       return;
     }
 
-    if (!propertyName || !roomCount || !propertyValue) {
-      Alert.alert('Please fill in all fields.');
-      return;
-    }
+    const error = validateFields({
+      'Property Name': propertyName,
+      'Room Count': roomCount,
+      'Property Value': propertyValue,
+    });
 
-    if (propertyName.includes('/')) {
-      Alert.alert('Property name cannot contain "/" character.');
-      return;
-    }
+    if (error) return Alert.alert(error);
 
     try {
       const propertyData = {

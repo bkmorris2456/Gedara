@@ -16,6 +16,7 @@ import {
 } from '../../../firebase/firebaseHelpers';
 import FormInput from '../../components/FormInput';
 import DropdownPicker from '../../components/DropdownPicker';
+import { validateFields } from '../../../firebase/validation';
 
 const RoomModal = ({ visible, onClose, onRoomAdded }) => {
   const [roomName, setRoomName] = useState('');
@@ -48,15 +49,8 @@ const RoomModal = ({ visible, onClose, onRoomAdded }) => {
   const handleAddRoom = async () => {
     if (submitting) return;
 
-    if (!roomName || !selectedPropertyId) {
-      Alert.alert('Please fill in all fields.');
-      return;
-    }
-
-    if (roomName.includes('/')) {
-      Alert.alert('Room name cannot contain "/" character.');
-      return;
-    }
+    const error = validateFields({ 'Room Name': roomName, 'Property': selectedPropertyId });
+    if (error) return Alert.alert(error);
 
     try {
       setSubmitting(true);

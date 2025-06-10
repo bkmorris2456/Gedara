@@ -17,6 +17,7 @@ import {
 } from '../../../firebase/firebaseHelpers';
 import FormInput from '../../components/FormInput';
 import DropdownPicker from '../../components/DropdownPicker';
+import { validateFields } from '../../../firebase/validation';
 
 const ItemModal = ({ visible, onClose, onItemAdded }) => {
   const [itemName, setItemName] = useState('');
@@ -76,15 +77,15 @@ const ItemModal = ({ visible, onClose, onItemAdded }) => {
   const handleAddItem = async () => {
     if (submitting) return;
 
-    if (!itemName || !itemQuantity || !estimatedValue || !selectedPropertyId || !selectedRoomId) {
-      Alert.alert('Please fill in all fields.');
-      return;
-    }
+    const error = validateFields({
+      'Item Name': itemName,
+      'Quantity': itemQuantity,
+      'Estimated Value': estimatedValue,
+      'Property': selectedPropertyId,
+      'Room': selectedRoomId,
+    });
 
-    if (itemName.includes('/')) {
-      Alert.alert('Item name cannot contain "/" character.');
-      return;
-    }
+    if (error) return Alert.alert(error);
 
     try {
       setSubmitting(true);
