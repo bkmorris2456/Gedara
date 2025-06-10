@@ -1,15 +1,19 @@
 import React, { useContext } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { AuthContext } from '../../firebase/AuthContext';
-import Login from '../pages/login';
-import Signup from '../pages/signup';
-import MainAppStack from './MainAppStack'; // 👈 New file you'll create
+import { AuthContext } from '../../firebase/AuthContext'; // Context providing auth state
+import Login from '../pages/login'; // Login screen component
+import Signup from '../pages/signup'; // Signup screen component
+import MainAppStack from './MainAppStack'; // Stack containing BottomTabs and DetailScreen
 
+// Create a native stack navigator instance
 const Stack = createNativeStackNavigator();
 
+// Root-level navigation component that determines which stack to show
 export default function RootNavigator() {
+  // Get authentication state and initialization status from context
   const { user, authInitializing } = useContext(AuthContext);
 
+  // While Firebase is initializing, render nothing to avoid flickering
   if (authInitializing) {
     return null;
   }
@@ -17,8 +21,10 @@ export default function RootNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {user ? (
-        <Stack.Screen name="MainApp" component={MainAppStack} /> // 👈 Will include DetailScreen inside
+        // If a user is authenticated, show the main app stack (bottom tabs + detail screen)
+        <Stack.Screen name="MainApp" component={MainAppStack} />
       ) : (
+        // If no user is signed in, show authentication screens
         <>
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="Signup" component={Signup} />
