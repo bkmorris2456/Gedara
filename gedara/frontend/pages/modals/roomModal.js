@@ -4,12 +4,15 @@ import { Picker } from '@react-native-picker/picker';
 import { auth, db } from '../../../config';
 import { collection, getDocs, addDoc, doc, serverTimestamp, setDoc, runTransaction } from 'firebase/firestore';
 
+// Modal component for the addition of rooms to a selected property
 const RoomModal = ({ visible, onClose }) => {
+
+  // State to manage input and selection
   const [roomName, setRoomName] = useState('');
   const [selectedProp, setSelectedProp] = useState('');
   const [props, setProps] = useState([]);
 
-  // Fetch homes when modal is opened
+  // Fetch properties when modal is opened
   useEffect(() => {
     const fetchProps = async () => {
       const user = auth.currentUser;
@@ -17,6 +20,8 @@ const RoomModal = ({ visible, onClose }) => {
         try {
           const allPropsRef = collection(db, 'properties');
           const querySnapshot = await getDocs(allPropsRef);
+
+          // Filter properties belonging to the current user
           const userProps = querySnapshot.docs
             .filter(doc => doc.data().userId === user.uid)
             .map(doc => ({
@@ -30,13 +35,15 @@ const RoomModal = ({ visible, onClose }) => {
       }
     };
 
+    // Trigger fetching only wehn modal becomes visible
     if (visible) {
       fetchProps();
     }
   }, [visible]);
 
-  // Function to add room to user's selected property
+  // Function to add a new room to user's selected property
   const addRoom = async () => {
+    // Validate form input
     if (!roomName || !selectedProp) {
       Alert.alert('Please fill in all fields.');
       return;
@@ -51,9 +58,10 @@ const RoomModal = ({ visible, onClose }) => {
       const user = auth.currentUser;
       if (!user) return;
 
-      const roomRef = doc(collection(db, 'rooms')); // Generate doc ref
-      const propertyRef = doc(db, 'properties', selectedProp);
+      const roomRef = doc(collection(db, 'rooms')); // Create new doc reference for room
+      const propertyRef = doc(db, 'properties', selectedProp); // Reference to the selected property
 
+      // Firestore transaction to update both room and associated property
       await runTransaction(db, async (transaction) => {
         const propDoc = await transaction.get(propertyRef);
         if (!propDoc.exists()) {
@@ -62,11 +70,12 @@ const RoomModal = ({ visible, onClose }) => {
 
         const currentTotal = propDoc.data().roomTotal || 0;
 
+        // Set the new room document
         transaction.set(roomRef, {
           roomName: roomName.trim(),
           homeId: selectedProp,
           userId: user.uid,
-          estVal: 0,
+          estVal: 0, // Default estimated value
           createdAt: serverTimestamp(),
         });
 
@@ -76,6 +85,7 @@ const RoomModal = ({ visible, onClose }) => {
       });
 
       Alert.alert('Room added successfully!');
+      // Clear fields and close modal
       setRoomName('');
       setSelectedProp('');
       onClose();
@@ -86,6 +96,7 @@ const RoomModal = ({ visible, onClose }) => {
     }
   };
 
+  // Modal display
   return (
     <Modal visible={visible} animationType="fade" transparent>
       <View style={styles.modalContainer}>
@@ -124,6 +135,7 @@ const RoomModal = ({ visible, onClose }) => {
   );
 };
 
+// Modal Styling
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,

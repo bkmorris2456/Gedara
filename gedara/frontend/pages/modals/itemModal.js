@@ -5,76 +5,87 @@ import { auth, db } from '../../../config';
 import { collection, getDocs, addDoc, query, where, serverTimestamp } from 'firebase/firestore';
 import { Picker } from '@react-native-picker/picker';
 
+// Modal component to add items to a given room within a specific property
 const ItemModal = ({ visible, onClose }) => {
+
+  // State variables for form fields and data
   const [itemName, setItemName] = useState('');
   const [itemQuant, setItemQuant] = useState('');
   const [estValue, setEstValue] = useState('');
-  const [homes, setHomes] = useState([]);
+  const [props, setProps] = useState([]);
   const [rooms, setRooms] = useState([]);
-  const [selectedHome, setSelectedHome] = useState('');
+  const [selectedProp, setSelectedProp] = useState('');
   const [selectedRoom, setSelectedRoom] = useState('');
 
   const { colors } = theme;
 
-  // Fetch homes for the current user
+  // Fetch properties when modal is visible
   useEffect(() => {
-    const fetchHomes = async () => {
+    const fetchProps = async () => {
       const user = auth.currentUser;
       if (!user) return;
 
       try {
-        const homesQuery = query(
+        const propsQuery = query(
           collection(db, 'properties'),
           where('userId', '==', user.uid)
         );
-        const querySnapshot = await getDocs(homesQuery);
-        const homesList = querySnapshot.docs.map(doc => ({
+        const querySnapshot = await getDocs(propsQuery);
+
+        // Store list of properties for Picker
+        const propsList = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data(),
         }));
-        setHomes(homesList);
+        setProps(propsList);
       } catch (error) {
-        console.error('Error fetching homes: ', error);
+        console.error('Error fetching properties: ', error);
       }
     };
 
     if (visible) {
-      fetchHomes();
-      setSelectedHome('');
+      fetchProps();
+      // Reset form fields and related state
+      setSelectedProp('');
       setSelectedRoom('');
       setRooms([]);
     }
   }, [visible]);
 
-  // Fetch rooms when home is selected
+  // Fetch rooms when a property is selected
   useEffect(() => {
     const fetchRooms = async () => {
       const user = auth.currentUser;
-      if (!user || !selectedHome) return;
+      if (!user || !selectedProp) return;
 
       try {
         const roomsQuery = query(
           collection(db, 'rooms'),
-          where('homeId', '==', selectedHome),
+          where('homeId', '==', selectedProp),
           where('userId', '==', user.uid)
         );
         const querySnapshot = await getDocs(roomsQuery);
+
+        // Store rooms to allow selection
         const roomsList = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data(),
         }));
         setRooms(roomsList);
-        setSelectedRoom(''); // Reset previously selected room
+        setSelectedRoom(''); // Reset room selection when home changes
       } catch (error) {
         console.error('Error fetching rooms: ', error);
       }
     };
 
     fetchRooms();
-  }, [selectedHome]);
+  }, [selectedProp]);
 
+  // Add new item to Firestore
   const addItem = async () => {
-    if (!itemName || !itemQuant || !estValue || !selectedHome || !selectedRoom) {
+
+    // Validate all fields
+    if (!itemName || !itemQuant || !estValue || !selectedProp || !selectedRoom) {
       Alert.alert('Please fill in all fields.');
       return;
     }
@@ -100,11 +111,13 @@ const ItemModal = ({ visible, onClose }) => {
         await addDoc(itemsRef, itemData);
 
         Alert.alert('Item added successfully!');
+
+        // Clear form and close modal
         setItemName('');
         setItemQuant('');
         setEstValue('');
         setSelectedRoom('');
-        setSelectedHome('');
+        setSelectedProp('');
         onClose();
       }
     } catch (error) {
@@ -121,12 +134,12 @@ const ItemModal = ({ visible, onClose }) => {
 
           {/* Property Picker */}
           <Picker
-            selectedValue={selectedHome}
-            onValueChange={(itemValue) => setSelectedHome(itemValue)}
+            selectedValue={selectedProp}
+            onValueChange={(itemValue) => setSelectedProp(itemValue)}
             style={{ width: '100%', height: 50 }}
           >
             <Picker.Item label="Select Property" value="" />
-            {homes.map((home) => (
+            {props.map((home) => (
               <Picker.Item key={home.id} label={home.propName || "Unnamed Home"} value={home.id} />
             ))}
           </Picker>
@@ -178,6 +191,7 @@ const ItemModal = ({ visible, onClose }) => {
   );
 };
 
+// Modal Styling
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,

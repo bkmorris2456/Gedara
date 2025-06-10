@@ -11,50 +11,60 @@ import { theme } from '../../theme';
 import { auth, db } from '../../../config';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
+// Modal component for adding a new property
 const HomeModal = ({ visible, onClose, onHomeAdded }) => {
+
+  // State variables and input fields
   const [propName, setPropName] = useState('');
   const [roomTotal, setRoomTotal] = useState('');
   const [propValue, setPropValue] = useState('');
 
-  // Function to add property
+  // Function to validate input information and add new property
   const addProperty = async () => {
     const user = auth.currentUser;
+
+    // Check if user is authenticated
     if (!user) {
       alert('No user signed in.');
       return;
     }
 
+    // Ensures all fields are filled
     if (!propName || !roomTotal || !propValue) {
       alert('Please fill in all fields.');
       return;
     }
 
+    // Prevent any invalid characters
     if (propName.includes('/')) {
       alert('Property name cannot contain "/" character.');
       return;
     }
 
     try {
+
+      // Clean and format input data
       const validPropData = {
         propName: propName.trim(),
         roomTotal: parseInt(roomTotal, 10),
         propValue: parseFloat(propValue),
         userId: user.uid,
-        createdAt: serverTimestamp(),
+        createdAt: serverTimestamp(), // Timestamp to track creation time
       };
 
-      const propertiesRef = collection(db, 'properties');
+      const propertiesRef = collection(db, 'properties'); // Reference to Firestore "properties" collection
 
       // Auto-generate a unique ID and add document
       await addDoc(propertiesRef, validPropData);
 
       alert('Property added successfully!');
 
+      // Callback to refresh data in parent component
       if (onHomeAdded) {
         onHomeAdded(); // Refresh the home list
       }
 
-      // Clear form fields
+      // Clear input fields and close modal
       setPropName('');
       setRoomTotal('');
       setPropValue('');
@@ -65,6 +75,7 @@ const HomeModal = ({ visible, onClose, onHomeAdded }) => {
     }
   };
 
+  // Modal display
   return (
     <Modal visible={visible} animationType="fade" transparent>
       <View style={styles.modalContainer}>
@@ -103,6 +114,7 @@ const HomeModal = ({ visible, onClose, onHomeAdded }) => {
   );
 };
 
+// Modal UI Styling
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
