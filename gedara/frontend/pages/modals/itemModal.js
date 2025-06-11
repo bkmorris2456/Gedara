@@ -8,7 +8,6 @@ import {
   StyleSheet,
   Alert,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 import { auth } from '../../../config';
 import {
   getUserProperties,
