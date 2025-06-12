@@ -4,6 +4,7 @@ import { AuthContext } from '../../firebase/AuthContext'; // Context providing a
 import Login from '../pages/login'; // Login screen component
 import Signup from '../pages/signup'; // Signup screen component
 import MainAppStack from './MainAppStack'; // Stack containing BottomTabs and DetailScreen
+import EditElement from '../pages/EditElement'; // Edit Template Screen
 
 // Create a native stack navigator instance
 const Stack = createNativeStackNavigator();
@@ -30,6 +31,7 @@ export default function RootNavigator() {
           <Stack.Screen name="Signup" component={Signup} />
         </>
       )}
+      <Stack.Screen name="EditElement" component={EditElement} />
     </Stack.Navigator>
   );
 }

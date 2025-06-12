@@ -126,7 +126,13 @@ export default function Home({ navigation, triggerDelete }) {
             });
           }
         }}
-        onEdit={() => console.log(`Edit ${type} ${item.id}`)}
+        onEdit={() => 
+          navigation.navigate('EditElement', {
+            elementType: type.toLowerCase(), // 'property', 'room', or 'item'
+            data: item,
+          })
+        }
+
         onDelete={() => console.log(`delete pressed`)}
       />
     );
@@ -178,7 +184,12 @@ export default function Home({ navigation, triggerDelete }) {
                 parentType: 'property',
                 title: prop.propName,
               })}
-              onEdit={() => console.log(`Edit Property ${prop.id}`)}
+              onEdit={() => 
+                navigation.navigate('EditElement', {
+                elementType: 'property',
+                data: prop,
+              })}
+              
               onDelete={() => console.log(`delete pressed`)}
             />
           ))}

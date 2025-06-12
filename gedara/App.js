@@ -22,26 +22,6 @@ import RootNavigator from './frontend/components/RootNavigator';
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-function BottomTabs() {
-  return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ color, size }) => {
-          let iconName;
-          if (route.name === 'Home') iconName = 'home-outline';
-          else if (route.name === 'Inventory') iconName = 'list-outline';
-          else if (route.name === 'Settings') iconName = 'person-outline';
-          return <Ionicons name={iconName} size={size} color={color} />;
-        },
-      })}
-    >
-      <Tab.Screen name="Home" component={Home} options={{ headerShown: false }} />
-      <Tab.Screen name="Inventory" component={Inventory} options={{ headerShown: false }} />
-      <Tab.Screen name="Settings" component={Settings} options={{ headerShown: false }} />
-    </Tab.Navigator>
-  );
-}
-
 export default function App() {
   const [theme, setTheme] = useState(DarkTheme); // Force Dark Mode as default
 
