@@ -3,6 +3,7 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import BottomTabs from './BottomTabs';
 import DetailScreen from '../pages/DetailScreen';
+import EditElement from '../pages/EditElement';
 
 // Create an instance of the native stack navigator
 const Stack = createNativeStackNavigator();
@@ -16,6 +17,9 @@ export default function MainAppStack() {
 
       {/* Detail screen that can be navigated to from anywhere in the app */}
       <Stack.Screen name="DetailScreen" component={DetailScreen} />
+
+      {/* Screen that handles edits to user-created content */}
+      {/* <Stack.Screen name="EditElement" component={EditElement}/> */}
     </Stack.Navigator>
   );
 }

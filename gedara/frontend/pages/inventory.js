@@ -53,7 +53,11 @@ export default function Inventory({ navigation }) {
                 parentType: 'property',
                 title: property.propName,
               })}
-              onEdit={() => console.log(`Edit Property ${property.id}`)}
+              onEdit={() => navigation.navigate('EditElement', {
+                elementType: 'property',
+                data: property,
+              })}
+              onDelete={() => console.log(`Delete property $(property.id)`)}
             />
           ))}
         </ScrollView>

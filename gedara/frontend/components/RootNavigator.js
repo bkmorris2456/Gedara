@@ -31,7 +31,6 @@ export default function RootNavigator() {
           <Stack.Screen name="Signup" component={Signup} />
         </>
       )}
-      <Stack.Screen name="EditElement" component={EditElement} />
     </Stack.Navigator>
   );
 }

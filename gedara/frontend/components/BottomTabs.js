@@ -1,41 +1,65 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 
-// Importing screen components to be used in the tabs
+// Import pages
 import Home from '../pages/home';
 import Inventory from '../pages/inventory';
 import Settings from '../pages/settings';
+import EditElement from '../pages/EditElement'; // ✅ Import edit screen
 
-// Create a bottom tab navigator instance
 const Tab = createBottomTabNavigator();
+const HomeStack = createNativeStackNavigator();
+const InventoryStack = createNativeStackNavigator();
+const SettingsStack = createNativeStackNavigator();
 
-// Main component for bottom tab navigation
+// Wrap Home tab in a stack so EditElement can live there
+function HomeStackScreen() {
+  return (
+    <HomeStack.Navigator screenOptions={{ headerShown: false }}>
+      <HomeStack.Screen name="Home" component={Home} />
+      <HomeStack.Screen name="EditElement" component={EditElement} />
+    </HomeStack.Navigator>
+  );
+}
+
+function InventoryStackScreen() {
+  return (
+    <InventoryStack.Navigator screenOptions={{ headerShown: false }}>
+      <InventoryStack.Screen name="Inventory" component={Inventory} />
+      <InventoryStack.Screen name="EditElement" component={EditElement} />
+    </InventoryStack.Navigator>
+  );
+}
+
+function SettingsStackScreen() {
+  return (
+    <SettingsStack.Navigator screenOptions={{ headerShown: false }}>
+      <SettingsStack.Screen name="Settings" component={Settings} />
+    </SettingsStack.Navigator>
+  );
+}
+
 export default function BottomTabs() {
   return (
     <Tab.Navigator
-
-      // Customizing tab screen options based on route
       screenOptions={({ route }) => ({
-
-        // Define icons dynamically based on route name
         tabBarIcon: ({ color, size }) => {
           let iconName;
 
-          // Assign appropriate icon for each tab
-          if (route.name === 'Home') iconName = 'home-outline';
-          else if (route.name === 'Inventory') iconName = 'list-outline';
-          else if (route.name === 'Settings') iconName = 'person-outline';
+          if (route.name === 'HomeTab') iconName = 'home-outline';
+          else if (route.name === 'InventoryTab') iconName = 'list-outline';
+          else if (route.name === 'SettingsTab') iconName = 'person-outline';
 
-          // Return Ionicons icon component with defined style
           return <Ionicons name={iconName} size={size} color={color} />;
         },
+        headerShown: false,
       })}
     >
-      {/* Define each screen in the bottom tab bar */}
-      <Tab.Screen name="Home" component={Home} options={{ headerShown: false }} />
-      <Tab.Screen name="Inventory" component={Inventory} options={{ headerShown: false }} />
-      <Tab.Screen name="Settings" component={Settings} options={{ headerShown: false }} />
+      <Tab.Screen name="HomeTab" component={HomeStackScreen} options={{ title: 'Home' }} />
+      <Tab.Screen name="InventoryTab" component={InventoryStackScreen} options={{ title: 'Inventory' }} />
+      <Tab.Screen name="SettingsTab" component={SettingsStackScreen} options={{ title: 'Settings' }} />
     </Tab.Navigator>
   );
 }
