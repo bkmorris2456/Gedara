@@ -89,3 +89,4 @@ export const addItemToRoom = async (userId, itemData) => {
   const docRef = await addDoc(itemsRef, newItem);
   return docRef.id;
 };
+

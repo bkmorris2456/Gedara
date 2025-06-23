@@ -6,11 +6,17 @@ import { Text } from 'react-native-paper';
 import { theme } from '../theme';
 import { auth, db } from '../../config';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import DeletionModal from '../pages/modals/deletionModal';
 
 // Inventory Screen 
 export default function Inventory({ navigation }) {
   const { colors } = theme;
   const [properties, setProperties] = useState([]); // State to hold user property data
+
+  // States for element deletion
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null); // holds { id, type }
+
 
   // Fetch user's properties from Firestore in real-time
   useEffect(() => {
@@ -57,11 +63,30 @@ export default function Inventory({ navigation }) {
                 elementType: 'property',
                 data: property,
               })}
-              onDelete={() => console.log(`Delete property $(property.id)`)}
+              onDelete={() => {
+                setItemToDelete({ id: item.id, type: item.type.toLowerCase() }); // e.g., 'property'
+                setShowDeleteModal(true);
+              }}
             />
           ))}
         </ScrollView>
       </View>
+
+      <DeletionModal
+        visible={showDeleteModal}
+        elementType={itemToDelete?.type}
+        onCancel={() => {
+          setShowDeleteModal(false);
+          setItemToDelete(null);
+        }}
+        onConfirm={() => {
+          // Placeholder - to be implemented in Step 3
+          console.log(`Confirmed deletion of ${itemToDelete?.type}: ${itemToDelete?.id}`);
+          setShowDeleteModal(false);
+        }}
+      />
+
+
     </Template>
   );
 }

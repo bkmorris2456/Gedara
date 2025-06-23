@@ -11,6 +11,7 @@ import {
   where,
   onSnapshot
 } from 'firebase/firestore';
+import DeletionModal from '../pages/modals/deletionModal';
 
 // Main Home Screen
 export default function Home({ navigation, triggerDelete }) {
@@ -25,6 +26,11 @@ export default function Home({ navigation, triggerDelete }) {
   const [items, setItems] = useState([]);
 
   const [recentEntries, setRecentEntries] = useState([]); // Merged and sorted list of recent additions made by user
+
+  // states for element deletion
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null); // holds { id, type }
+
 
   // Fetch all elements created by the user
   useEffect(() => {
@@ -133,7 +139,10 @@ export default function Home({ navigation, triggerDelete }) {
           })
         }
 
-        onDelete={() => console.log(`delete pressed`)}
+        onDelete={() => {
+          setItemToDelete({ id: item.id, type: item.type.toLowerCase() }); // e.g., 'property'
+          setShowDeleteModal(true);
+        }}
       />
     );
   };
@@ -190,7 +199,10 @@ export default function Home({ navigation, triggerDelete }) {
                 data: prop,
               })}
               
-              onDelete={() => console.log(`delete pressed`)}
+              onDelete={() => {
+                setItemToDelete({ id: prop.id, type: 'property' }); // Just hardcode type to 'property' here
+                setShowDeleteModal(true);
+              }}
             />
           ))}
         </ScrollView>
@@ -222,6 +234,21 @@ export default function Home({ navigation, triggerDelete }) {
         </View>
 
       </View>
+
+      <DeletionModal
+        visible={showDeleteModal}
+        elementType={itemToDelete?.type}
+        onCancel={() => {
+          setShowDeleteModal(false);
+          setItemToDelete(null);
+        }}
+        onConfirm={() => {
+          // Placeholder - to be implemented in Step 3
+          console.log(`Confirmed deletion of ${itemToDelete?.type}: ${itemToDelete?.id}`);
+          setShowDeleteModal(false);
+        }}
+      />
+
     </Template>
   );
 }
