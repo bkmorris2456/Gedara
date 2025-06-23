@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert } from 'react-native';
 import Template from '../pages/template';
 import Card from '../components/card';
 import { Text } from 'react-native-paper';
@@ -7,6 +7,7 @@ import { theme } from '../theme';
 import { auth, db } from '../../config';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import DeletionModal from '../pages/modals/deletionModal';
+import { deleteElementAndChildren } from '../../firebase/firebaseHelpers';
 
 // Inventory Screen 
 export default function Inventory({ navigation }) {
@@ -64,7 +65,7 @@ export default function Inventory({ navigation }) {
                 data: property,
               })}
               onDelete={() => {
-                setItemToDelete({ id: item.id, type: item.type.toLowerCase() }); // e.g., 'property'
+                setItemToDelete({ id: property.id, type: 'property' }); // Just hardcode type to 'property' here
                 setShowDeleteModal(true);
               }}
             />
@@ -79,10 +80,18 @@ export default function Inventory({ navigation }) {
           setShowDeleteModal(false);
           setItemToDelete(null);
         }}
-        onConfirm={() => {
-          // Placeholder - to be implemented in Step 3
-          console.log(`Confirmed deletion of ${itemToDelete?.type}: ${itemToDelete?.id}`);
-          setShowDeleteModal(false);
+        onConfirm={async () => {
+          if (!itemToDelete?.type || !itemToDelete?.id) return;
+
+          try {
+            await deleteElementAndChildren(itemToDelete.type, itemToDelete.id);
+            console.log(`Deleted ${itemToDelete.type} with ID: ${itemToDelete.id}`);
+          } catch (error) {
+            console.error('Error deleting element:', error);
+          } finally {
+            setShowDeleteModal(false);
+            setItemToDelete(null);
+          }
         }}
       />
 

@@ -19,7 +19,7 @@ export default function MainAppStack() {
       <Stack.Screen name="DetailScreen" component={DetailScreen} />
 
       {/* Screen that handles edits to user-created content */}
-      {/* <Stack.Screen name="EditElement" component={EditElement}/> */}
+      <Stack.Screen name="EditElement" component={EditElement}/>
     </Stack.Navigator>
   );
 }

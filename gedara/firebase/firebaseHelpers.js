@@ -3,6 +3,8 @@ import {
   doc,
   addDoc,
   getDocs,
+  deleteDoc,
+  writeBatch,
   query,
   where,
   runTransaction,
@@ -90,3 +92,47 @@ export const addItemToRoom = async (userId, itemData) => {
   return docRef.id;
 };
 
+/**
+ * Deletes a document and any of its related sub-elements depending on type.
+ * @param {'property' | 'room' | 'item'} type - The type of element to delete.
+ * @param {string} id - The ID of the element.
+ */
+export const deleteElementAndChildren = async (type, id) => {
+  const batch = writeBatch(db);
+
+  if (type === 'property') {
+    // Delete all rooms and items linked to this property
+    const roomsQuery = query(collection(db, 'rooms'), where('homeId', '==', id));
+    const roomsSnapshot = await getDocs(roomsQuery);
+
+    for (const roomDoc of roomsSnapshot.docs) {
+      const roomId = roomDoc.id;
+      
+      // Delete all items inside this room
+      const itemsQuery = query(collection(db, 'items'), where('roomId', '==', roomId));
+      const itemsSnapshot = await getDocs(itemsQuery);
+      itemsSnapshot.forEach((itemDoc) => batch.delete(doc(db, 'items', itemDoc.id)));
+
+      // Delete the room itself
+      batch.delete(doc(db, 'rooms', roomId));
+    }
+
+    // Delete the property
+    batch.delete(doc(db, 'properties', id));
+
+  } else if (type === 'room') {
+    // Delete all items linked to this room
+    const itemsQuery = query(collection(db, 'items'), where('roomId', '==', id));
+    const itemsSnapshot = await getDocs(itemsQuery);
+    itemsSnapshot.forEach((itemDoc) => batch.delete(doc(db, 'items', itemDoc.id)));
+
+    // Delete the room itself
+    batch.delete(doc(db, 'rooms', id));
+
+  } else if (type === 'item') {
+    // Just delete the item
+    batch.delete(doc(db, 'items', id));
+  }
+
+  await batch.commit();
+};

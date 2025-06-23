@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, FlatList } from 'react-native';
+import { View, StyleSheet, ScrollView, FlatList, Alert } from 'react-native';
 import Template from '../pages/template';
 import Card from '../components/card';
 import { Provider as PaperProvider, Text } from 'react-native-paper';
@@ -12,6 +12,7 @@ import {
   onSnapshot
 } from 'firebase/firestore';
 import DeletionModal from '../pages/modals/deletionModal';
+import { deleteElementAndChildren } from '../../firebase/firebaseHelpers';
 
 // Main Home Screen
 export default function Home({ navigation, triggerDelete }) {
@@ -242,13 +243,20 @@ export default function Home({ navigation, triggerDelete }) {
           setShowDeleteModal(false);
           setItemToDelete(null);
         }}
-        onConfirm={() => {
-          // Placeholder - to be implemented in Step 3
-          console.log(`Confirmed deletion of ${itemToDelete?.type}: ${itemToDelete?.id}`);
-          setShowDeleteModal(false);
+        onConfirm={async () => {
+          if (!itemToDelete?.type || !itemToDelete?.id) return;
+
+          try {
+            await deleteElementAndChildren(itemToDelete.type, itemToDelete.id);
+            console.log(`Deleted ${itemToDelete.type} with ID: ${itemToDelete.id}`);
+          } catch (error) {
+            console.error('Error deleting element:', error);
+          } finally {
+            setShowDeleteModal(false);
+            setItemToDelete(null);
+          }
         }}
       />
-
     </Template>
   );
 }

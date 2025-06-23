@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useRoute } from '@react-navigation/native';
 import { db } from '../../config';
@@ -8,6 +8,8 @@ import Template from './template';
 import Card from '../components/card';
 import { theme } from '../theme';
 import { Ionicons } from '@expo/vector-icons';
+import DeletionModal from '../pages/modals/deletionModal';
+import { deleteElementAndChildren } from '../../firebase/firebaseHelpers';
 
 // Template screen to display all elements under parent element
 export default function DetailScreen({ navigation }) {
@@ -15,6 +17,10 @@ export default function DetailScreen({ navigation }) {
   const route = useRoute();
   const { parentId, parentType, title } = route.params;
   const [children, setChildren] = useState([]);
+
+  // states for element deletion
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null); // holds { id, type }
 
   // Fetch the children data from Firestore based on parent type
   useEffect(() => {
@@ -78,12 +84,47 @@ export default function DetailScreen({ navigation }) {
                   });
                 }
               }}
-              onEdit={() => console.log(`Edit ${child.id}`)} // Placeholder edit handler
-              onDelete={() => console.log(`Delete ${child.id}`)} // Placeholder deletion handler
+              onEdit={() =>
+                navigation.navigate('EditElement', {
+                  elementType: parentType === 'property' ? 'room' : 'item',
+                  data: child,
+                })
+              }
+              onDelete={() => {
+                setItemToDelete({
+                  id: child.id,
+                  type: parentType === 'property' ? 'room' : 'item',
+                });
+                setShowDeleteModal(true);
+              }}
             />
           ))}
         </ScrollView>
       </View>
+
+      <DeletionModal
+        visible={showDeleteModal}
+        elementType={itemToDelete?.type}
+        onCancel={() => {
+          setShowDeleteModal(false);
+          setItemToDelete(null);
+        }}
+        onConfirm={async () => {
+          if (!itemToDelete?.type || !itemToDelete?.id) return;
+
+          try {
+            await deleteElementAndChildren(itemToDelete.type, itemToDelete.id);
+            console.log(`Deleted ${itemToDelete.type} with ID: ${itemToDelete.id}`);
+          } catch (error) {
+            console.error('Error deleting element:', error);
+          } finally {
+            Alert.alert('Deleted!', `${itemToDelete.type} has been removed.`);
+            setShowDeleteModal(false);
+            setItemToDelete(null);
+          }
+        }}
+      />
+
     </Template>
   );
 }
