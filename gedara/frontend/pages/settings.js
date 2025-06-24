@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView, TextInput, Typography, Pressable } from 'react-native';
+import { View, StyleSheet, ScrollView, TextInput, Typography, Pressable, TouchableOpacity } from 'react-native';
 import Template from '../pages/template';
 import { Provider as PaperProvider, Text, Surface, Button } from 'react-native-paper';
 import { theme } from '../theme';
@@ -10,6 +10,11 @@ export default function Settings({ navigation }) {
 
   const { colors } = theme;
   const auth = getAuth();
+
+  // Switches user to Change Settings page
+  const changeSettings = () => {
+    console.log('Button has been pressed!');
+  };
 
   // Logs the user out and resets auth state
   const handleLogout = () => {
@@ -39,12 +44,16 @@ export default function Settings({ navigation }) {
             <Text>Profile Picture Frame</Text>
           </View>
 
-          <Text></Text>
-          <Text></Text>
+          <View style={styles.textContainer}>
+            <Text style={styles.initialDisplay}>Insert Name Here</Text>
+            <Text style={styles.initialDisplay}>Insert Email Here</Text>
+          </View>
         </View>
 
         <View style={styles.containerTwo}>
-          
+          <TouchableOpacity style={styles.changeSettings} onPress={changeSettings}>
+            <Text style={styles.changeSettingsText}>Change Settings</Text>
+          </TouchableOpacity>
         </View>
 
         <Pressable onPress={handleLogout}>
@@ -64,6 +73,28 @@ const styles = StyleSheet.create({
     paddingVertical: 20, // Adds spacing for better scrolling experience
     display: 'flex',
     alignItems: 'center',
+  },
+  containerOne: {
+    width: '100%',
+    height: 'auto',
+    display: 'flex',
+    flexDirection: 'row',
+    marginHorizontal: 20,
+    alignItems: 'center',
+  },
+  containerTwo: {
+    width: '100%',
+    height: 'auto',
+    display: 'flex',
+    alignItems: 'center',
+    marginTop: 25,
+    marginBottom: 50,
+  },
+  textContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    margin: 10,
+    marginLeft: 25,
   },
   headers: {
     display: 'flex',
@@ -91,5 +122,25 @@ const styles = StyleSheet.create({
     color: '#fff',
     alignItems: 'center',
     display: 'flex',
+    marginTop: 155,
   },
+  initialDisplay: {
+    color: '#fff',
+    fontSize: '20px',
+    margin: 10,
+  },
+  changeSettings: {
+    backgroundColor: '#1e1e1e',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    width: '60%',
+    height: 'auto',
+    display: 'flex',
+    alignItems: 'center',
+  },
+  changeSettingsText: {
+    color: '#fff',
+    fontSize: 16,
+  }
 })
