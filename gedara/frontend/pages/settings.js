@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView, TextInput } from 'react-native';
+import { View, StyleSheet, ScrollView, TextInput, Typography, Pressable } from 'react-native';
 import Template from '../pages/template';
 import { Provider as PaperProvider, Text, Surface, Button } from 'react-native-paper';
 import { theme } from '../theme';
@@ -25,58 +25,31 @@ export default function Settings({ navigation }) {
   // Render Settings screen
   return (
     <Template navigation={navigation}>
+
       <ScrollView 
       contentContainerStyle={styles.scrollContainer}
       showsVerticalScrollIndicator={false} // Hides the vertical scrollbar
       showsHorizontalScrollIndicator={false} // Hides the horizontal scrollbar
       >
 
-        <Text style={styles.headers}>User Settings</Text>
+        <Text style={styles.headers}>Settings</Text>
 
-        {/* Current placeholder image for Profile Picture functionality */}
-        <View style={[styles.pic, { width: 100, height: 100, borderRadius: 100 / 2 }]}>
-          {/* <Image source={source} style={[styles.image, { width: , height: size, borderRadius: size / 2 }]} /> */}
-          <Text style={{justifyContent: "center", alignItems: "center", display: "flex"}}>Profile Pic</Text>
+        <View style={styles.containerOne}>
+          <View style={styles.pictureFrame}>
+            <Text>Profile Picture Frame</Text>
+          </View>
+
+          <Text></Text>
+          <Text></Text>
         </View>
 
-        {/* Form for updating user info */}
-        <View style={[styles.settings_form, { backgroundColor: colors.primary }]}>
-
-          <View style={styles.inputContainers}>
-            <Text style={styles.inputLabels}>Full Name</Text>
-            <TextInput style={[styles.inputs]}/>
-          </View>
-
-          <View style={styles.inputContainers}>
-            <Text style={styles.inputLabels}>Email</Text>
-            <TextInput style={[styles.inputs]}/>
-          </View>
-
-          <View style={styles.inputContainers}>
-            <Text style={styles.inputLabels}>Password</Text>
-            <TextInput style={[styles.inputs]}/>
-          </View>
-
-          <View style={styles.buttonContainer}>
-            <Button
-              mode="contained"
-              onPress={() => console.log("Save pressed")}
-              style={styles.save}
-            >
-              <Text>Save Changes</Text>
-            </Button>
-          </View>
-
+        <View style={styles.containerTwo}>
+          
         </View>
 
-        {/* Button for user logout */}
-        <Button
-          mode="contained"
-          onPress={handleLogout}
-          style={styles.save}
-        >
-          <Text>Logout/Switch Account</Text>
-        </Button>
+        <Pressable onPress={handleLogout}>
+          <Text style={styles.logout}>Logout</Text>
+        </Pressable>
 
       </ScrollView>
 
@@ -88,57 +61,35 @@ export default function Settings({ navigation }) {
 const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1, // Ensures the scroll view takes the full height
-    justifyContent: "center",
-    alignItems: "center",
     paddingVertical: 20, // Adds spacing for better scrolling experience
-  },
-  headers: {
-    fontSize: 24,
-    marginVertical: 5,
-    color: '#ffffff',
-  },
-  pic: {
-    overflow: 'hidden',
-    backgroundColor: '#fff',
-    marginVertical: 20,
-  },
-  settings_form: {
-    width: 350,
-    height: 'auto',
+    display: 'flex',
     alignItems: 'center',
   },
-  inputs: {
-    height: 40,
-    width: 300,
-    margin: 15,
-    borderWidth: 1,
-    borderColor: "#fff",
-    padding: 10,
-    color: '#fff'
+  headers: {
+    display: 'flex',
+    fontSize: 36,
+    marginVertical: 5,
+    marginLeft: 10,
+    color: '#ffffff',
+    alignItems: 'left',
   },
-  inputLabels: {
-    color: '#fff',
-    fontSize: 16,
-    marginLeft: 20,
-  },
-  inputContainers: {
-    marginVertical: 2,
-  },
+  pictureFrame: {
+    width: 125,
+    height: 125,
+    backgroundColor: '#fff',
+    borderRadius: 62.5,
+    marginVertical: 10,
+    alignItems: 'center',
+  },  
   buttonContainer: {
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-around",
     marginVertical: 20,
   },
-  save: {
-    width: "75%",
-    height: 40,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    margin: 10,
-    backgroundColor: "white",
-    borderRadius: 2,
-    color: '#000',
-  }
+  logout: {
+    color: '#fff',
+    alignItems: 'center',
+    display: 'flex',
+  },
 })

@@ -12,7 +12,7 @@ import RoomModal from './modals/roomModal';
 import ItemModal from './modals/itemModal';
 
 // Static assets
-const logo = require('../../assets/favicon.png');
+const logo = require('../../assets/roomary-logo.png');
 const Tab = createBottomTabNavigator();
 
 // Template component wraps each screen with header and modals
@@ -39,7 +39,7 @@ const Template = ({ children, navigation, onHomeAdded }) => {
           <TouchableOpacity onPress={() => {
             navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
           }}>
-            <Text variant="titleLarge" style={[styles.title, { color: colors.text }]}>Gedara</Text>
+            <Text variant="titleLarge" style={[styles.title, { color: colors.text }]}>Roomary</Text>
           </TouchableOpacity>
           
           {/* Right side menu button */}
