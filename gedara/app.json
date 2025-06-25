@@ -19,7 +19,10 @@
       "runtimeVersion": {
         "policy": "appVersion"
       },
-      "jsEngine": "hermes"
+      "jsEngine": "hermes",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "googleServicesFile": "./google-services.json",

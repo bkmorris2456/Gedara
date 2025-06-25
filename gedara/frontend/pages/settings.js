@@ -1,15 +1,46 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, ScrollView, TextInput, Typography, Pressable, TouchableOpacity } from 'react-native';
 import Template from '../pages/template';
 import { Provider as PaperProvider, Text, Surface, Button } from 'react-native-paper';
 import { theme } from '../theme';
 import { getAuth, signOut } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../../config'; // Adjust this to your actual Firebase config file
 
-// Seetings Screen
+// Settings Screen
 export default function Settings({ navigation }) {
 
   const { colors } = theme;
   const auth = getAuth();
+
+  const [userName, setUserName] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+
+  useEffect(() => {
+    const currentUser = auth.currentUser;
+
+    if (currentUser) {
+      setUserEmail(currentUser.email);
+
+      const fetchUserData = async () => {
+        try {
+          const docRef = doc(db, 'users', currentUser.uid);
+          const docSnap = await getDoc(docRef);
+
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            setUserName(data.name || 'No name available');
+          } else {
+            console.log('No such user document!');
+          }
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+        }
+      };
+
+      fetchUserData();
+    }
+  }, []);
 
   // Switches user to Change Settings page
   const changeSettings = () => {
@@ -45,8 +76,8 @@ export default function Settings({ navigation }) {
           </View>
 
           <View style={styles.textContainer}>
-            <Text style={styles.initialDisplay}>Insert Name Here</Text>
-            <Text style={styles.initialDisplay}>Insert Email Here</Text>
+            <Text style={styles.initialDisplay}>{userName}</Text>
+            <Text style={styles.initialDisplay}>{userEmail}</Text>
           </View>
         </View>
 
@@ -126,7 +157,7 @@ const styles = StyleSheet.create({
   },
   initialDisplay: {
     color: '#fff',
-    fontSize: '20px',
+    fontSize: '16px',
     margin: 10,
   },
   changeSettings: {
