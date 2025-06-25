@@ -1,181 +1,180 @@
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
+  Platform,
+  TextInput,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
+import { PaperProvider, Button } from 'react-native-paper';
 import { auth, db } from '../../config';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { collection, doc, setDoc, serverTimestamp } from 'firebase/firestore';
-import React from 'react';
-import {
-    View,
-    Text,
-    StyleSheet,
-    KeyboardAvoidingView,
-    TouchableWithoutFeedback,
-    Keyboard,
-    Platform,
-    TextInput
-} from 'react-native';
-import { Button, PaperProvider } from 'react-native-paper';
-import Card from '../components/card';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 export default function Signup({ navigation }) {
-    const [email, onChangeEmail] = React.useState('');
-    const [password, onChangePassword] = React.useState('');
-    const [name, onChangeName] = React.useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
 
-    const addUser = async () => {
+  const addUser = async () => {
+    if (!name || !email || !password) {
+      alert('Please fill in all fields.');
+      return;
+    }
 
-        if (name && email && password) {
-            try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-                const userRef = doc(db, 'users', user.uid);
-                console.log('User registered:');
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
 
-                await setDoc(userRef, {
-                    name,
-                    email,
-                    createdAt: serverTimestamp(),
-                });
+      await setDoc(doc(db, 'users', user.uid), {
+        name,
+        email,
+        createdAt: serverTimestamp(),
+      });
 
-                alert('Account created!');
-                onChangeEmail('');
-                onChangePassword('');
-                onChangeName('');
-            } catch (error) {
-                alert("Signup failed: " + error.message);
-            }
-        } else {
-            alert("Please fill in all fields.");
-        }
+      alert('Account created!');
+      setEmail('');
+      setPassword('');
+      setName('');
+    } catch (error) {
+      alert('Signup failed: ' + error.message);
+    }
+  };
 
-    };
+  return (
+    <PaperProvider>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <ScrollView contentContainerStyle={styles.container}>
+            <Text style={styles.title}>Welcome to Gedara</Text>
 
-    return (
-        <PaperProvider>
-            <View style={styles.container}>
-                <KeyboardAvoidingView
-                    behavior={Platform.OS === "ios" ? "padding" : "height"}
-                    style={{ flex: 1 }}
-                >
-                    <TouchableWithoutFeedback
-                    onPress={() => {
-                        if (Platform.OS !== 'web') {
-                        Keyboard.dismiss();
-                        }
-                    }}
-                    >
-                        <View style={{ flex: 1 }}>
-                            <View style={styles.intro_text}>
-                                <Text style={styles.intro_text}>Welcome to Gedara</Text>
-                            </View>
+            <View style={styles.card}>
+              <Text style={styles.header}>Sign Up</Text>
 
-                            <Card style={styles.login_container} width="100%">
-                                <View style={styles.info_organizer}>
-                                    <Text style={styles.login_text}>Sign Up!</Text>
+              <Text style={styles.label}>Name</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Your name"
+                placeholderTextColor="#888"
+                value={name}
+                onChangeText={setName}
+                autoCapitalize="words"
+              />
 
-                                    <Text style={{ color: '#fff' }}>Name</Text>
-                                    <TextInput
-                                        style={styles.input}
-                                        value={name}
-                                        onChangeText={onChangeName}
-                                        autoCapitalize='none'
-                                    />
-                                    <Text style={{ color: '#fff' }}>Email</Text>
-                                    <TextInput
-                                        style={styles.input}
-                                        value={email}
-                                        onChangeText={onChangeEmail}
-                                        autoCapitalize='none'
-                                    />
-                                    <Text style={{ color: '#fff' }}>Password</Text>
-                                    <TextInput
-                                        style={styles.input}
-                                        value={password}
-                                        onChangeText={onChangePassword}
-                                        secureTextEntry={true}
-                                        autoCapitalize='none'
-                                    />
+              <Text style={styles.label}>Email</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Your email"
+                placeholderTextColor="#888"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
 
-                                    <Button
-                                        mode="contained"
-                                        onPress={addUser}
-                                        style={styles.save}
-                                    >
-                                        Sign Up
-                                    </Button>
+              <Text style={styles.label}>Password</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Create a password"
+                placeholderTextColor="#888"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                autoCapitalize="none"
+              />
 
-                                    <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 15 }}>
-                                        <Text style={styles.text}>Already have an account? </Text>
-                                        <TouchableWithoutFeedback onPress={() => navigation.navigate('Login')}>
-                                            <Text style={[styles.text, { color: '#1079AA' }]}>Login</Text>
-                                        </TouchableWithoutFeedback>
-                                    </View>
+              <Button
+                mode="contained"
+                onPress={addUser}
+                style={styles.button}
+                labelStyle={styles.buttonText}
+              >
+                Sign Up
+              </Button>
 
-                                </View>
-                            </Card>
-                        </View>
-                    </TouchableWithoutFeedback>
-                </KeyboardAvoidingView>
+              <View style={styles.footer}>
+                <Text style={styles.label}>Already have an account?</Text>
+                <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                  <Text style={styles.link}> Login</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-        </PaperProvider>
-    );
-};
+          </ScrollView>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
+    </PaperProvider>
+  );
+}
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#121212',
-        padding: 20,
-        justifyContent: 'center',
-    },
-    intro_text: {
-        padding: 20,
-        marginBottom: 5,
-        marginTop: 50,
-        color: "#fff",
-        alignItems: 'center',
-        fontSize: 24,
-        textAlign: 'center',
-    },
-    login_container: {
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
-    },
-    info_organizer: {
-        width: '100%',
-    },
-    input: {
-        height: 40,
-        marginVertical: 10,
-        borderWidth: 1,
-        borderColor: "#fff",
-        padding: 10,
-        color: '#fff',
-        width: '100%',
-    },
-    login_text: {
-        color: '#fff',
-        fontSize: 24,
-        marginBottom: 20,
-        textAlign: 'center',
-    },
-    save: {
-        height: 40,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "white",
-        marginTop: 20,
-        borderRadius: 2,
-        color: '#000',
-        width: '100%',
-    },
-    signup_button: {
-        height: 40,
-        justifyContent: "center",
-        alignItems: "center",
-        marginTop: 20,
-    },
-    text: {
-        color: '#fff',
-    },
+  container: {
+    flexGrow: 1,
+    backgroundColor: '#121212',
+    padding: 20,
+    justifyContent: 'center',
+  },
+  title: {
+    color: '#fff',
+    fontSize: 28,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: 30,
+  },
+  card: {
+    backgroundColor: '#1e1e1e',
+    borderRadius: 12,
+    padding: 20,
+    elevation: 3,
+  },
+  header: {
+    color: '#fff',
+    fontSize: 24,
+    marginBottom: 20,
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  label: {
+    color: '#ddd',
+    fontSize: 14,
+    marginBottom: 4,
+  },
+  input: {
+    height: 48,
+    borderColor: '#444',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    color: '#fff',
+    marginBottom: 16,
+  },
+  button: {
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    height: 48,
+    justifyContent: 'center',
+    marginTop: 10,
+  },
+  buttonText: {
+    color: '#121212',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 16,
+  },
+  link: {
+    color: '#1079AA',
+    fontWeight: '600',
+  },
 });

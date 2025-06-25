@@ -1,161 +1,163 @@
-import React from 'react';
-import { 
-    View, 
-    Text, 
-    StyleSheet, 
-    Image, 
-    TouchableOpacity, 
-    useColorScheme, 
-    TextInput,
-    KeyboardAvoidingView,
-    TouchableWithoutFeedback,
-    Keyboard,
-    Platform,
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  Keyboard,
+  Platform,
+  KeyboardAvoidingView,
+  ScrollView,
 } from 'react-native';
-import { Provider as PaperProvider, Surface, Button } from 'react-native-paper';
-import Card from '../components/card';
-import { auth } from '../../config';
+import { Provider as PaperProvider, Button } from 'react-native-paper';
 import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../config';
 
-export default function Login({ navigation, children }) {
+export default function Login({ navigation }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-    const [email, onChangeEmail] = React.useState('');
-    const [password, onChangePassword] = React.useState('');
-    const [loading, setLoading] = React.useState(false);
+  const signIn = async () => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      alert('Login successful!');
+    } catch (error) {
+      switch (error.code) {
+        case 'auth/user-not-found':
+          alert("No user found with this email.");
+          break;
+        case 'auth/wrong-password':
+          alert("Incorrect password.");
+          break;
+        case 'auth/invalid-email':
+          alert("The email address is badly formatted.");
+          break;
+        default:
+          alert('Login failed: ' + error.message);
+      }
+    }
+  };
 
-    // Function that handles verification of user login using given data
-    const signIn = async () => {
-        try {
-            await signInWithEmailAndPassword(auth, email, password);
-            alert('Login successful!');
-            navigation.navigate('Home'); // redirect user here
-            // redirect user here
-        } catch (error) {
-            switch (error.code) {
-                case 'auth/user-not-found':
-                    alert("No user found with this email.");
-                    break;
-                case 'auth/wrong-password':
-                    alert("Incorrect password.");
-                    break;
-                case 'auth/invalid-email':
-                    alert("The email address is badly formatted.");
-                    break;
-                default:
-                    alert('Login failed: ' + error.message);
-            }        }
-    };
+  return (
+    <PaperProvider>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <ScrollView contentContainerStyle={styles.container}>
+            <Text style={styles.title}>Welcome to Roomary</Text>
 
-    return (
-        <PaperProvider>
-            <View style={styles.container}>
-                <KeyboardAvoidingView
-                    behavior={Platform.OS === "ios" ? "padding" : "height"}
-                    style={{ flex: 1 }}
-                >
-                    <TouchableWithoutFeedback
-                    onPress={() => {
-                        if (Platform.OS !== 'web') {
-                        Keyboard.dismiss();
-                        }
-                    }}
-                    >
-                        <View style={{ flex: 1 }}>
-                            <View style={styles.intro_text}>
-                                <Text style={styles.intro_text}>Welcome to Gedara</Text>
-                            </View>
+            <View style={styles.card}>
+              <Text style={styles.header}>Login</Text>
 
-                            <Card style={styles.login_container} width="100%">
+              <Text style={styles.label}>Email</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter Email Address"
+                placeholderTextColor="#888"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
 
-                                <View style={styles.info_organizer}>
+              <Text style={styles.label}>Password</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter Password"
+                placeholderTextColor="#888"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+              />
 
-                                    <Text style={styles.login_text}>Login</Text>
-                                    <Text style={styles.text}>Email</Text>
-                                    <TextInput style={styles.input} onChangeText={onChangeEmail} value={email} />
-                                    <Text style={styles.text}>Password</Text>
-                                    <TextInput style={styles.input} onChangeText={onChangePassword} value={password} />
+              <Button
+                mode="contained"
+                onPress={signIn}
+                style={styles.button}
+                labelStyle={styles.buttonText}
+              >
+                Login
+              </Button>
 
-                                    <Button
-                                    mode="contained"
-                                    onPress={() => signIn()}
-                                    style={styles.save}
-                                    >
-                                        Login
-                                    </Button>
-
-                                    <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 15 }}>
-                                        <Text style={styles.text}>Don't have an account? </Text>
-                                        <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-                                            <Text style={[styles.text, { color: '#1079AA' }]}>Sign Up</Text>
-                                        </TouchableOpacity>
-                                    </View>
-
-
-                                </View>
-
-                            </Card>
-                        </View>
-                    </TouchableWithoutFeedback>
-                </KeyboardAvoidingView>
+              <View style={styles.footer}>
+                <Text style={styles.label}>Don't have an account?</Text>
+                <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+                  <Text style={styles.link}> Sign Up</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-        </PaperProvider>
-        
-    );
-};
+          </ScrollView>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
+    </PaperProvider>
+  );
+}
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#121212',
-        padding: 20,
-        justifyContent: 'center',
-    },
-    intro_text: {
-        padding: 20,
-        marginBottom: 5,
-        marginTop: 50,
-        color: "#fff",
-        alignItems: 'center',
-        fontSize: 24,
-        textAlign: 'center',
-    },
-    login_container: {
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
-        width: '100%',
-        
-    },
-    info_organizer: {
-        width: '100%',
-    },
-    input: {
-        height: 40,
-        marginVertical: 10,
-        borderWidth: 1,
-        borderColor: "#fff",
-        padding: 10,
-        color: '#fff',
-        width: '100%',
-    },
-    login_text: {
-        color: '#fff',
-        fontSize: 24,
-        marginBottom: 20,
-        textAlign: 'center',
-    },
-    save: {
-        height: 40,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "white",
-        marginTop: 20,
-        borderRadius: 2,
-        color: '#000',
-        width: '100%',
-    },
-    text: {
-        color: '#fff',
-    }
+  container: {
+    flexGrow: 1,
+    backgroundColor: '#121212',
+    padding: 20,
+    justifyContent: 'center',
+  },
+  title: {
+    color: '#fff',
+    fontSize: 28,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: 30,
+  },
+  card: {
+    backgroundColor: '#1e1e1e',
+    borderRadius: 12,
+    padding: 20,
+    elevation: 3,
+  },
+  header: {
+    color: '#fff',
+    fontSize: 24,
+    marginBottom: 20,
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  label: {
+    color: '#ddd',
+    fontSize: 14,
+    marginBottom: 4,
+  },
+  input: {
+    height: 48,
+    borderColor: '#444',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    color: '#fff',
+    marginBottom: 16,
+  },
+  button: {
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    height: 48,
+    justifyContent: 'center',
+    marginTop: 10,
+  },
+  buttonText: {
+    color: '#121212',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 16,
+  },
+  link: {
+    color: '#1079AA',
+    fontWeight: '600',
+  },
 });

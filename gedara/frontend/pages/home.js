@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, FlatList, Alert } from 'react-native';
+import { View, StyleSheet, FlatList, Dimensions } from 'react-native';
 import Template from '../pages/template';
 import Card from '../components/card';
-import { Provider as PaperProvider, Text } from 'react-native-paper';
+import { Text } from 'react-native-paper';
 import { theme } from '../theme';
 import { auth, db } from '../../config';
 import {
@@ -14,227 +14,163 @@ import {
 import DeletionModal from '../pages/modals/deletionModal';
 import { deleteElementAndChildren } from '../../firebase/firebaseHelpers';
 
-// Main Home Screen
-export default function Home({ navigation, triggerDelete }) {
+const screenWidth = Dimensions.get('window').width;
+
+export default function Home({ navigation }) {
   const { colors } = theme;
 
-  // States for managing data
-  const [props, setProps] = useState([]); // Raw list of user's properties (for My Properties section)
-
-  // All user elements (properties, rooms, and items)
+  const [props, setProps] = useState([]);
   const [properties, setProperties] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [items, setItems] = useState([]);
+  const [recentEntries, setRecentEntries] = useState([]);
 
-  const [recentEntries, setRecentEntries] = useState([]); // Merged and sorted list of recent additions made by user
-
-  // states for element deletion
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState(null); // holds { id, type }
+  const [itemToDelete, setItemToDelete] = useState(null);
 
-
-  // Fetch all elements created by the user
   useEffect(() => {
     const userId = auth.currentUser?.uid;
     if (!userId) return;
 
-    const propertiesQuery = query(
-      collection(db, 'properties'),
-      where('userId', '==', userId)
-    );
-    const roomsQuery = query(
-      collection(db, 'rooms'),
-      where('userId', '==', userId)
-    );
-    const itemsQuery = query(
-      collection(db, 'items'),
-      where('userId', '==', userId)
-    );
+    const propsQuery = query(collection(db, 'properties'), where('userId', '==', userId));
+    const roomsQuery = query(collection(db, 'rooms'), where('userId', '==', userId));
+    const itemsQuery = query(collection(db, 'items'), where('userId', '==', userId));
 
-    // Real-time listeners for properties, rooms, and items
-    const unsubProperties = onSnapshot(propertiesQuery, (snapshot) => {
-      const data = snapshot.docs.map(doc => ({
-        ...doc.data(),
-        id: doc.id,
-        type: 'Property',
-      }));
-      setProperties(data);
+    const unsubProps = onSnapshot(propsQuery, (snap) => {
+      const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setProps(data);
+      setProperties(data.map(item => ({ ...item, type: 'Property' })));
     });
 
-    const unsubRooms = onSnapshot(roomsQuery, (snapshot) => {
-      const data = snapshot.docs.map(doc => ({
-        ...doc.data(),
-        id: doc.id,
-        type: 'Room',
-      }));
-      setRooms(data);
+    const unsubRooms = onSnapshot(roomsQuery, (snap) => {
+      setRooms(snap.docs.map(doc => ({ id: doc.id, ...doc.data(), type: 'Room' })));
     });
 
-    const unsubItems = onSnapshot(itemsQuery, (snapshot) => {
-      const data = snapshot.docs.map(doc => ({
-        ...doc.data(),
-        id: doc.id,
-        type: 'Item',
-      }));
-      setItems(data);
+    const unsubItems = onSnapshot(itemsQuery, (snap) => {
+      setItems(snap.docs.map(doc => ({ id: doc.id, ...doc.data(), type: 'Item' })));
     });
 
-    // Clean up the listeners on component unmount
     return () => {
-      unsubProperties();
+      unsubProps();
       unsubRooms();
       unsubItems();
     };
   }, []);
 
-  // Merge and sort all entries by creation time for recent activity section
   useEffect(() => {
     const all = [...properties, ...rooms, ...items];
     const sorted = all
-      .filter(entry => entry.createdAt) // Only entries with timestamps
-      .sort((a, b) => b.createdAt?.seconds - a.createdAt?.seconds) // Sorted by descending order
-      .slice(0, 5); // Show only the 5 most recent
+      .filter(e => e.createdAt)
+      .sort((a, b) => b.createdAt.seconds - a.createdAt.seconds)
+      .slice(0, 5);
     setRecentEntries(sorted);
   }, [properties, rooms, items]);
 
-  // Used in FlatList to render each item
-  const renderItem = ({ item }) => {
-    let displayName = '';
-    let type = item.type;
+  const renderPropertyCard = ({ item }) => (
+    <Card
+      width={screenWidth * 0.82}
+      height={125}
+      title={item.propName || 'Unnamed Property'}
+      type="Property"
+      onPress={() => navigation.navigate('DetailScreen', {
+        parentId: item.id,
+        parentType: 'property',
+        title: item.propName,
+      })}
+      onEdit={() => navigation.navigate('EditElement', {
+        elementType: 'property',
+        data: item,
+      })}
+      onDelete={() => {
+        setItemToDelete({ id: item.id, type: 'property' });
+        setShowDeleteModal(true);
+      }}
+    />
+  );
 
-    // Resolve a display name based on the type of element
-    if (type === 'Property') {
-      displayName = item.propName || 'Unnamed Property';
-    } else if (type === 'Room') {
-      displayName = item.roomName || 'Unnamed Room';
-    } else if (type === 'Item') {
-      displayName = item.itemName || 'Unnamed Item';
-    }
+  const renderItem = ({ item }) => {
+    const displayName =
+      item.type === 'Property' ? item.propName :
+      item.type === 'Room' ? item.roomName :
+      item.type === 'Item' ? item.itemName :
+      'Unnamed';
 
     return (
       <Card
-        width="90%"
+        width={screenWidth * 0.82}
         height={100}
         title={displayName}
-        type={type}
-        // Navigate to DetailScreen template to load up children elements depending on type of card pressed
+        type={item.type}
         onPress={() => {
-          if (type === 'Property') {
+          const parentType = item.type.toLowerCase();
+          if (parentType === 'property' || parentType === 'room') {
             navigation.navigate('DetailScreen', {
               parentId: item.id,
-              parentType: 'property',
-              title: displayName,
-            });
-          } else if (type === 'Room') {
-            navigation.navigate('DetailScreen', {
-              parentId: item.id,
-              parentType: 'room',
+              parentType,
               title: displayName,
             });
           }
         }}
-        onEdit={() => 
+        onEdit={() =>
           navigation.navigate('EditElement', {
-            elementType: type.toLowerCase(), // 'property', 'room', or 'item'
+            elementType: item.type.toLowerCase(),
             data: item,
           })
         }
-
         onDelete={() => {
-          setItemToDelete({ id: item.id, type: item.type.toLowerCase() }); // e.g., 'property'
+          setItemToDelete({ id: item.id, type: item.type.toLowerCase() });
           setShowDeleteModal(true);
         }}
+        style={{marginBottom: 10}}
       />
     );
   };
 
-  // Fetch raw property list for horizontal scroll section
-  useEffect(() => {
-    const userId = auth.currentUser?.uid;
-    if (!userId) return;
-
-    const userPropsRef = query(
-      collection(db, 'properties'),
-      where('userId', '==', userId)
-    );
-
-    const unsubProps = onSnapshot(userPropsRef, (snapshot) => {
-      const propsList = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setProps(propsList);
-    });
-
-    return () => unsubProps();
-  }, []);
-
-  // Render Home screen
   return (
     <Template navigation={navigation}>
-      <View style={[styles.container, { backgroundColor: colors.primary }]}>
-
-        {/* My Properties section of Home screen */}
-        <Text style={[styles.headers]}>My Properties</Text>
-        <ScrollView 
-          style={[styles.properties]} 
-          horizontal={true} 
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingLeft: 10, gap: 15 }}
-        >
-          {props.map((prop) => (
-            <Card
-              key={prop.id}
-              width={340}
-              height={125}
-              title={prop.propName}
-              type="Property"
-              onPress={() => navigation.navigate('DetailScreen', {
-                parentId: prop.id,
-                parentType: 'property',
-                title: prop.propName,
-              })}
-              onEdit={() => 
-                navigation.navigate('EditElement', {
-                elementType: 'property',
-                data: prop,
-              })}
-              
-              onDelete={() => {
-                setItemToDelete({ id: prop.id, type: 'property' }); // Just hardcode type to 'property' here
-                setShowDeleteModal(true);
-              }}
+      <FlatList
+        data={[]} // Required by FlatList
+        renderItem={null}
+        keyExtractor={() => 'container'}
+        contentContainerStyle={styles.scrollContainer}
+        ListHeaderComponent={
+          <>
+            {/* My Properties */}
+            <Text style={styles.headers}>My Properties</Text>
+            <FlatList
+              data={props}
+              renderItem={renderPropertyCard}
+              keyExtractor={item => item.id}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              snapToInterval={screenWidth * 0.9 + 10}
+              decelerationRate="fast"
+              contentContainerStyle={styles.horizontalScroll}
+              scrollEnabled={true}
             />
-          ))}
-        </ScrollView>
 
-        {/* Recently Added Section of Home Screen */}
-        <Text style={[styles.headers]}>Recently Added</Text>
-        <View style={styles.recent}>
-          <FlatList
-            data={recentEntries}
-            keyExtractor={(item) => item.id}
-            renderItem={renderItem}
-            ListEmptyComponent={<Text style={{ color: '#fff' }}>No recent entries</Text>}
-            contentContainerStyle={{gap: 10}}
-          />
-        </View>
+            {/* Recently Added */}
+            <Text style={styles.headers}>Recently Added</Text>
+            <FlatList
+              data={recentEntries}
+              keyExtractor={item => item.id}
+              renderItem={renderItem}
+              ListEmptyComponent={<Text style={styles.emptyText}>No recent entries</Text>}
+              contentContainerStyle={{ gap: 10 }}
+              scrollEnabled={false} // avoids nested scroll issue
+            />
 
-        {/* Inventory Summary Section */}
-        <Text style={[styles.headers]}>Inventory Value</Text>
-        <View style={styles.summaries}>
-          <Card width={120} height={100} style={{ marginRight: 10 }}>
-            <Text style={styles.general_text}>Total Items</Text>
-          </Card>
-          <Card width={120} height={100} style={{ marginRight: 10 }}>
-            <Text style={styles.general_text}>Total Rooms</Text>
-          </Card>
-          <Card width={120} height={100} style={{ marginRight: 10 }}>
-            <Text style={styles.general_text}>Total Value</Text>
-          </Card>
-        </View>
-
-      </View>
+            {/* Inventory Summary */}
+            <Text style={styles.headers}>Inventory Summary</Text>
+            <View style={styles.summaries}>
+              <Card width={120} height={100}><Text style={styles.general_text}>Total Items</Text></Card>
+              <Card width={120} height={100}><Text style={styles.general_text}>Total Rooms</Text></Card>
+              <Card width={120} height={100}><Text style={styles.general_text}>Total Value</Text></Card>
+            </View>
+          </>
+        }
+      />
 
       <DeletionModal
         visible={showDeleteModal}
@@ -261,54 +197,37 @@ export default function Home({ navigation, triggerDelete }) {
   );
 }
 
-// Styling for Home Screen and components
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 5,
+  scrollContainer: {
+    padding: 10,
+    paddingBottom: 80,
+    backgroundColor: theme.colors.primary,
   },
   headers: {
     color: '#fff',
     fontSize: 20,
     fontWeight: 'bold',
-    marginVertical: 15,
+    marginTop: 20,
+    marginBottom: 10,
   },
-  properties: {
-    marginTop: 5,
-    flexGrow: 1,
-    maxHeight: 125,
-  },
-  recent: {
-    marginVertical: 5,
-    flexGrow: 1,
-    maxHeight: 325,
-    overflow: 'hidden',
+  horizontalScroll: {
+    paddingLeft: 10,
+    paddingRight: 10,
+    gap: 10,
   },
   summaries: {
     flexDirection: 'row',
-    marginVertical: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
+    marginTop: 20,
   },
   general_text: {
-    flex: 1,
-    textAlign: 'center',
     color: '#fff',
-    fontSize: 15,
-  },
-  entryCard: {
-    backgroundColor: '#f1f1f1',
-    padding: 10,
-    marginVertical: 6,
-    borderRadius: 8,
-  },
-  entryType: {
+    textAlign: 'center',
     fontSize: 14,
-    color: '#888',
   },
-  entryName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+  emptyText: {
+    color: '#ccc',
+    textAlign: 'center',
+    marginTop: 10,
   },
 });
