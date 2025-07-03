@@ -15,6 +15,7 @@ import DeletionModal from '../pages/modals/deletionModal';
 import { deleteElementAndChildren } from '../../firebase/firebaseHelpers';
 
 const screenWidth = Dimensions.get('window').width;
+const screenHeight = Dimensions.get('window').height;
 
 export default function Home({ navigation }) {
   const { colors } = theme;
@@ -68,8 +69,8 @@ export default function Home({ navigation }) {
 
   const renderPropertyCard = ({ item }) => (
     <Card
-      width={screenWidth * 0.82}
-      height={125}
+      width={screenWidth * 0.80}
+      height={120}
       title={item.propName || 'Unnamed Property'}
       type="Property"
       onPress={() => navigation.navigate('DetailScreen', {
@@ -98,7 +99,7 @@ export default function Home({ navigation }) {
     return (
       <Card
         width={screenWidth * 0.82}
-        height={100}
+        height={120}
         title={displayName}
         type={item.type}
         onPress={() => {
@@ -121,56 +122,60 @@ export default function Home({ navigation }) {
           setItemToDelete({ id: item.id, type: item.type.toLowerCase() });
           setShowDeleteModal(true);
         }}
-        style={{marginBottom: 10}}
       />
     );
   };
 
   return (
     <Template navigation={navigation}>
-      <FlatList
-        data={[]} // Required by FlatList
-        renderItem={null}
-        keyExtractor={() => 'container'}
-        contentContainerStyle={styles.scrollContainer}
-        ListHeaderComponent={
-          <>
-            {/* My Properties */}
-            <Text style={styles.headers}>My Properties</Text>
-            <FlatList
-              data={props}
-              renderItem={renderPropertyCard}
-              keyExtractor={item => item.id}
-              horizontal
-              pagingEnabled
-              showsHorizontalScrollIndicator={false}
-              snapToInterval={screenWidth * 0.9 + 10}
-              decelerationRate="fast"
-              contentContainerStyle={styles.horizontalScroll}
-              scrollEnabled={true}
-            />
+      <View style={styles.container}>
 
-            {/* Recently Added */}
-            <Text style={styles.headers}>Recently Added</Text>
-            <FlatList
-              data={recentEntries}
-              keyExtractor={item => item.id}
-              renderItem={renderItem}
-              ListEmptyComponent={<Text style={styles.emptyText}>No recent entries</Text>}
-              contentContainerStyle={{ gap: 10 }}
-              scrollEnabled={false} // avoids nested scroll issue
-            />
+        {/* My Properties */}
+        <View style={{ height: screenHeight * 0.2 }}>
+          <Text style={styles.headers}>My Properties</Text>
+          <FlatList
+            data={props}
+            renderItem={renderPropertyCard}
+            keyExtractor={item => item.id}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            snapToInterval={screenWidth * 0.9 + 10}
+            decelerationRate="fast"
+            contentContainerStyle={styles.horizontalScroll}
+          />
+        </View>
 
-            {/* Inventory Summary */}
-            <Text style={styles.headers}>Inventory Summary</Text>
+        {/* Recently Added (scrollable) */}
+        <View style={{ height: screenHeight * 0.32 }}>
+          <Text style={styles.headers}>Recently Added</Text>
+          <FlatList
+            data={recentEntries}
+            keyExtractor={item => item.id}
+            renderItem={renderItem}
+            ListEmptyComponent={<Text style={styles.emptyText}>No recent entries</Text>}
+            contentContainerStyle={{ gap: 10 }}
+            scrollEnabled={true}
+            showsVerticalScrollIndicator={true}
+          />
+        </View>
+
+        {/* Inventory Summary */}
+        <View style={{ minHeight: screenHeight * 0.2, paddingBottom: 20 }}>
+          <Text style={styles.headers}>Inventory Summary</Text>
             <View style={styles.summaries}>
-              <Card width={120} height={100}><Text style={styles.general_text}>Total Items</Text></Card>
-              <Card width={120} height={100}><Text style={styles.general_text}>Total Rooms</Text></Card>
-              <Card width={120} height={100}><Text style={styles.general_text}>Total Value</Text></Card>
+              <Card width={120} height={110} style={styles.summaryCard}>
+                <Text style={styles.summaryText}>Total Items</Text>
+              </Card>
+              <Card width={120} height={110} style={styles.summaryCard}>
+                <Text style={styles.summaryText}>Total Rooms</Text>
+              </Card>
+              <Card width={120} height={110} style={styles.summaryCard}>
+                <Text style={styles.summaryText}>Total Value</Text>
+              </Card>
             </View>
-          </>
-        }
-      />
+        </View>
+      </View>
 
       <DeletionModal
         visible={showDeleteModal}
@@ -198,16 +203,16 @@ export default function Home({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  scrollContainer: {
+  container: {
+    flex: 1,
     padding: 10,
-    paddingBottom: 80,
     backgroundColor: theme.colors.primary,
   },
   headers: {
     color: '#fff',
     fontSize: 20,
     fontWeight: 'bold',
-    marginTop: 20,
+    marginTop: 10,
     marginBottom: 10,
   },
   horizontalScroll: {
@@ -218,16 +223,29 @@ const styles = StyleSheet.create({
   summaries: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 20,
+    marginTop: 10,
   },
   general_text: {
+    display: 'flex',
     color: '#fff',
     textAlign: 'center',
+    justifyContent: 'center',
     fontSize: 14,
   },
   emptyText: {
     color: '#ccc',
     textAlign: 'center',
     marginTop: 10,
+  },
+  summaryCard: {
+  justifyContent: 'flex-start',
+  paddingTop: 10,
+  paddingHorizontal: 5,
+  },
+  summaryText: {
+    color: '#fff',
+    fontSize: 14,
+    textAlign: 'center',
+    justifyContent: 'center',
   },
 });
