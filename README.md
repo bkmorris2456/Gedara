@@ -1,6 +1,6 @@
 # Roomary
 
-Mobile Application dedicated to reorganizing your home.
+Mobile Application dedicated to reorganizing and keeping up with your property.
 
 ## Table of Contents
 
