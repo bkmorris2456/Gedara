@@ -39,9 +39,9 @@ cd gedara
 npm install
 
 # Start the development server
-(If viewing from a windows machine or on a web browser):
+# Command for running on a Windows machine or into a web browser:
 npx expo start --web
-(If viewing on a Mac machine)
+# Command for Mac machines, and if you have the Xcode Emulator set up:
 npx expo start --ios
 ```
 
@@ -54,8 +54,8 @@ npx expo start --ios
 6. With any of the items you have added, press the delete text, and confirm deletion
 
 ## Technologies Used
-Frontend: React Native, MaterialUI
-Backend: JavaScript
+Frontend: React Native, MaterialUI  
+Backend: JavaScript  
 Database: Firebase
 
 ## License
