@@ -2,29 +2,31 @@ import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
-  Button,
-  Modal,
   StyleSheet,
   Alert,
+  Modal,
+  KeyboardAvoidingView,
+  Platform,
+  FlatList,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import { Menu, Button, Provider as PaperProvider } from 'react-native-paper';
 import { auth } from '../../../config';
 import {
   getUserProperties,
   addRoomToProperty,
 } from '../../../firebase/firebaseHelpers';
 import FormInput from '../../components/FormInput';
-import DropdownPicker from '../../components/DropdownPicker';
 import { validateFields } from '../../../firebase/validation';
 
 const RoomModal = ({ visible, onClose, onRoomAdded }) => {
   const [roomName, setRoomName] = useState('');
   const [selectedPropertyId, setSelectedPropertyId] = useState('');
+  const [selectedPropertyName, setSelectedPropertyName] = useState('');
   const [properties, setProperties] = useState([]);
   const [submitting, setSubmitting] = useState(false);
 
-  // Fetch properties when modal opens
+  const [menuVisible, setMenuVisible] = useState(false);
+
   useEffect(() => {
     const fetchProperties = async () => {
       const user = auth.currentUser;
@@ -42,14 +44,17 @@ const RoomModal = ({ visible, onClose, onRoomAdded }) => {
       fetchProperties();
       setRoomName('');
       setSelectedPropertyId('');
+      setSelectedPropertyName('');
     }
   }, [visible]);
 
-  // Submit new room
   const handleAddRoom = async () => {
     if (submitting) return;
 
-    const error = validateFields({ 'Room Name': roomName, 'Property': selectedPropertyId });
+    const error = validateFields({
+      'Room Name': roomName,
+      Property: selectedPropertyId,
+    });
     if (error) return Alert.alert(error);
 
     try {
@@ -64,6 +69,7 @@ const RoomModal = ({ visible, onClose, onRoomAdded }) => {
 
       setRoomName('');
       setSelectedPropertyId('');
+      setSelectedPropertyName('');
       onClose();
     } catch (error) {
       console.error('Error adding room:', error);
@@ -75,35 +81,72 @@ const RoomModal = ({ visible, onClose, onRoomAdded }) => {
 
   return (
     <Modal visible={visible} animationType="fade" transparent>
-      <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
-          <Text style={styles.title}>Add Room</Text>
+      <PaperProvider>
+        <KeyboardAvoidingView
+          style={styles.modalContainer}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+          <View style={styles.modalContent}>
+            <Text style={styles.title}>Add Room</Text>
 
-          {/* Property Picker */}
-          <DropdownPicker
-            selectedValue={selectedPropertyId}
-            onValueChange={setSelectedPropertyId}
-            items={properties.map((p) => ({ id: p.id, label: p.propName }))}
-            prompt="Select Property"
-          />
+            {/* Property Picker Menu */}
+            <Menu
+              visible={menuVisible}
+              onDismiss={() => setMenuVisible(false)}
+              anchor={
+                <Button
+                  mode="outlined"
+                  onPress={() => setMenuVisible(true)}
+                  style={styles.menuButton}
+                  labelStyle={styles.menuButtonLabel}
+                >
+                  {selectedPropertyName || 'Select Property'}
+                </Button>
+              }
+              contentStyle={styles.menuDropdown}
+            >
+              <FlatList
+                data={properties}
+                keyExtractor={(item) => item.id}
+                style={styles.scrollableMenu}
+                nestedScrollEnabled
+                renderItem={({ item }) => (
+                  <Menu.Item
+                    onPress={() => {
+                      setSelectedPropertyId(item.id);
+                      setSelectedPropertyName(item.propName);
+                      setMenuVisible(false);
+                    }}
+                    titleStyle={styles.menuItemText}
+                    title={item.propName}
+                  />
+                )}
+              />
+            </Menu>
 
-          {/* Room Name Input */}
-          <FormInput
-            placeholder="Room Name"
-            value={roomName}
-            onChangeText={setRoomName}
-          />
-
-          <View style={styles.buttonStructure}>
-            <Button title="Close" onPress={onClose} color="red" />
-            <Button
-              title="Submit"
-              onPress={handleAddRoom}
-              disabled={submitting}
+            {/* Room Name Input */}
+            <FormInput
+              placeholder="Room Name"
+              value={roomName}
+              onChangeText={setRoomName}
             />
+
+            {/* Buttons */}
+            <View style={styles.buttonStructure}>
+              <Button onPress={onClose} mode="contained" color="red">
+                Close
+              </Button>
+              <Button
+                onPress={handleAddRoom}
+                mode="contained"
+                disabled={submitting}
+              >
+                Submit
+              </Button>
+            </View>
           </View>
-        </View>
-      </View>
+        </KeyboardAvoidingView>
+      </PaperProvider>
     </Modal>
   );
 };
@@ -113,10 +156,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    color: 'white',
   },
   modalContent: {
-    width: 300,
+    borderWidth: 1.5,
+    borderColor: 'white',
+    width: '80%',
     padding: 20,
     backgroundColor: '#0a0a0a',
     borderRadius: 10,
@@ -128,21 +172,33 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     color: 'white',
   },
-  input: {
+  menuButton: {
     width: '100%',
-    borderBottomWidth: 1,
-    marginVertical: 15,
-    padding: 5,
-    color: '#fff',
+    marginBottom: 15,
     borderColor: 'white',
+    borderWidth: 1,
+    borderRadius: 4, // Less rounded
+    justifyContent: 'center',
+  },
+  menuButtonLabel: {
+    color: 'white',
+    textAlign: 'left',
+  },
+  menuDropdown: {
+    backgroundColor: '#fff',
+    paddingVertical: 0,
+  },
+  scrollableMenu: {
+    maxHeight: 230, // ~5 items at ~46px each
+  },
+  menuItemText: {
+    color: 'black',
   },
   buttonStructure: {
     flexDirection: 'row',
     width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     marginTop: 10,
-    gap: 55,
   },
 });
 

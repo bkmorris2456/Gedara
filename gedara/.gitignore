@@ -42,3 +42,10 @@ FIREBASE_PROJECT_ID = gedara-efb76
 FIREBASE_STORAGE_BUCKET = gedara-efb76.appspot.com
 FIREBASE_MESSAGING_SENDER_ID = 17964960877
 FIREBASE_APP_ID = 1:17964960877:web:009d9da891535552624364
+
+# Ignore iOS app files
+*.app
+*.dylib
+*.tar.gz
+/build/
+/ios/*.app

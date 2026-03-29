@@ -34,11 +34,14 @@ const Card = ({
       ]}
     >
       
-      {/* Top row with title and type */}
-      <View style={styles.rowTop}>
-        <Text style={styles.titleText}>{title}</Text>
-        <Text style={styles.typeText}>{type}</Text>
-      </View>
+      {/* Top row with title and type (only render if title or type is passed) */}
+      {(title || type) && (
+        <View style={styles.rowTop}>
+          {title ? <Text style={styles.titleText}>{title}</Text> : <View />}
+          {type ? <Text style={styles.typeText}>{type}</Text> : <View />}
+        </View>
+      )}
+
 
       {/* Space for any nested components (e.g., detail rows, icons, etc.) */}
       <View style={styles.childrenContainer}>{children}</View>

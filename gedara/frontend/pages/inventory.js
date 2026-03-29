@@ -47,7 +47,7 @@ export default function Inventory({ navigation }) {
         <Text style={[styles.headers]}>Properties</Text>
 
         {/* Scrollable list of all user-owned properties */}
-        <ScrollView style={styles.properties} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20, gap: 15 }}>
+        <ScrollView style={styles.properties} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 5, gap: 15 }}>
           {properties.map((property) => (
             <Card
               key={property.id}
